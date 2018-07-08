@@ -1,5 +1,7 @@
 # tipsv
-![version][version-image]  
+![version][version-image]
+[![release][release-image]][release]  
+
 Waveform computation by Direct solution method (DSM)
 
 This software is based on the software which can be downloaded from [University of Tokyo][dsm]
@@ -23,4 +25,7 @@ USAGE:
 This *mpi-tipsv* can also run by mpi.
 
 [dsm]: http://www-solid.eps.s.u-tokyo.ac.jp/~dsm/software/software.htm
-[version-image]:https://img.shields.io/badge/version-0.3.2-yellow.svg
+[version-image]:https://img.shields.io/badge/version-0.90.0-yellow.svg
+
+[release-image]:https://img.shields.io/badge/release-Hinterland-pink.svg
+[release]:https://finalfantasy.wikia.com/wiki/Dravanian_Hinterlands
