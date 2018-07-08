@@ -22,6 +22,8 @@
 *.a
 *.lib
 
+*.spc
+
 # Executables
 *.exe
 *.out
