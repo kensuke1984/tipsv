@@ -1,24 +1,25 @@
 SUBROUTINE DCSYMBDL(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
-    !**********************************************************************
-    !  GAUSS METHOD FOR A SYMMETRIC BAND MATRIX WITH A SHORT WIDTH.       *
-    !  THIS ROUTINE IS FOR A VECTOR COMPUTER.                             *
-    !                                                                     *
-    !  PARAMETERS:                                                        *
-    !   ON ENTRY:                                                         *
-    !     A      THE ARRAY WITH DIMENSION (M+1)*N WHICH CONTAINS          *
-    !            THE LOWER BAND MATRIX IN ROW-WISE.                       *
-    !     M      THE HALF BAND WIDTH OF THE MATRIX A, EXCLUDING DIADONALS.*
-    !     N      THE ORDER OF THE MATRIX A.                               *
-    !     NN     THE ORDER OF WORKING ARRAYS L, LI, AND LJ.               *
-    !     EPS    THE TOLERANCE FOR PIVOTAL ELEMENTS.                      *
-    !   ON RETURN:                                                        *
-    !     A      THE LOWER TRIANGULAR MATRIX L AFTER DECOMPOSITION.       *
-    !     IER    ERROR CODE. IF IER=0, NORMAL RETURN.                     *
-    !   OTHERS: WORKING PARAMETERS.                                       *
-    !                                                                     *
-    !  COPYRIGHT:       FUMIKO NAGAHORI    1 SEP. 1991      VER. 1        *
-    !    modified: Kensuke Konishi 2018 in Paris
-    !**********************************************************************
+!**********************************************************************
+!  GAUSS METHOD FOR A SYMMETRIC BAND MATRIX WITH A SHORT WIDTH.       *
+!  THIS ROUTINE IS FOR A VECTOR COMPUTER.                             *
+!                                                                     *
+!  PARAMETERS:                                                        *
+!   ON ENTRY:                                                         *
+!     A      THE ARRAY WITH DIMENSION (M+1)*N WHICH CONTAINS          *
+!            THE LOWER BAND MATRIX IN ROW-WISE.                       *
+!     M      THE HALF BAND WIDTH OF THE MATRIX A, EXCLUDING DIADONALS.*
+!     N      THE ORDER OF THE MATRIX A.                               *
+!     NN     THE ORDER OF WORKING ARRAYS L, LI, AND LJ.               *
+!     EPS    THE TOLERANCE FOR PIVOTAL ELEMENTS.                      *
+!   ON RETURN:                                                        *
+!     A      THE LOWER TRIANGULAR MATRIX L AFTER DECOMPOSITION.       *
+!     IER    ERROR CODE. IF IER=0, NORMAL RETURN.                     *
+!   OTHERS: WORKING PARAMETERS.                                       *
+!                                                                     *
+!  COPYRIGHT:       FUMIKO NAGAHORI    1 SEP. 1991      VER. 1        *
+!    modified: Kensuke Konishi 2018 in Paris
+!**********************************************************************
+    implicit none
     INTEGER:: N,M,MM,NN
     INTEGER:: L(NN),LI(NN),LJ(NN),IER
     double precision::EPS
@@ -89,26 +90,27 @@ SUBROUTINE DCSYMBDL(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
 END SUBROUTINE DCSYMBDL
 !
 SUBROUTINE DCSBDLV(A,B,M,N,NP,EPS,Z,IER)
-    !**********************************************************************
-    !  GAUSS METHOD FOR A SYMMETRIC BAND MATRIX WITH A SHORT WIDTH.       *
-    !  THIS ROUTINE IS FOR A VECTOR COMPUTER.                             *
-    !                                                                     *
-    !  PARAMETERS:                                                        *
-    !   ON ENTRY:                                                         *
-    !     A      THE ARRAY WITH DIMENSION (M+1),N WHICH CONTAINS          *
-    !            THE LEFT HAND SIDE LOWER BAND MATRIX.                    *
-    !     M      THE HALF BAND WIDTH OF THE MATRIX A, EXCLUDING DIADONALS.*
-    !     N      THE ORDER OF THE MATRIX A.                               *
-    !     EPS    THE TOLERANCE FOR PIVOTAL ELEMENTS.                      *
-    !     B      RIGHT HAND SIDE VECTOR                                   *
-    !   ON RETURN:                                                        *
-    !     B      SOLUTION.                                                *
-    !     IER    ERROR CODE. IF IER=0, NORMAL RETURN.                     *
-    !   OTHERS: WORKING PARAMETERS.                                       *
-    !                                                                     *
-    !  COPYRIGHT:       FUMIKO NAGAHORI    1 SEP. 1991      VER. 1        *
-    ! modified: Kensuke Konishi 2018 in Paris
-    !**********************************************************************
+!**********************************************************************
+!  GAUSS METHOD FOR A SYMMETRIC BAND MATRIX WITH A SHORT WIDTH.       *
+!  THIS ROUTINE IS FOR A VECTOR COMPUTER.                             *
+!                                                                     *
+!  PARAMETERS:                                                        *
+!   ON ENTRY:                                                         *
+!     A      THE ARRAY WITH DIMENSION (M+1),N WHICH CONTAINS          *
+!            THE LEFT HAND SIDE LOWER BAND MATRIX.                    *
+!     M      THE HALF BAND WIDTH OF THE MATRIX A, EXCLUDING DIADONALS.*
+!     N      THE ORDER OF THE MATRIX A.                               *
+!     EPS    THE TOLERANCE FOR PIVOTAL ELEMENTS.                      *
+!     B      RIGHT HAND SIDE VECTOR                                   *
+!   ON RETURN:                                                        *
+!     B      SOLUTION.                                                *
+!     IER    ERROR CODE. IF IER=0, NORMAL RETURN.                     *
+!   OTHERS: WORKING PARAMETERS.                                       *
+!                                                                     *
+!  COPYRIGHT:       FUMIKO NAGAHORI    1 SEP. 1991      VER. 1        *
+! modified: Kensuke Konishi 2018 in Paris
+!**********************************************************************
+    implicit none
     INTEGER:: M,N,NP,IER
     double precision::EPS
     COMPLEX(kind(0d0)):: A(M+1,N),B(N),Z(N)

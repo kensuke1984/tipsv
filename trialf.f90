@@ -7,6 +7,7 @@ subroutine calbvec( l,theta,phi,plm,bvec )
     ! Evaluating the value of toroidal harmonics (fully normalized)
     ! at each station whose latitude and longitude are theta and phi.
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     double precision:: pi
     parameter ( pi=3.1415926535897932d0 )
     !
@@ -47,19 +48,16 @@ end
 !
 
 subroutine caldveczero( l,bvec )
-  
     implicit none
     double precision, parameter ::  pi=3.1415926535897932d0
-	
     integer:: l,m,i
     double precision :: fact,coef
     complex(kind(0d0)) :: bvec(1:3,-2:2)
     double precision :: xl2
-	
-	
+
     bvec = cmplx(0.d0)
     xl2 = dble(l) * dble(l+1)
-	
+
     do m=0,min0(l,1)
         fact = 1.d0
         if ( m/=0 ) then
@@ -86,11 +84,12 @@ subroutine caldveczero( l,bvec )
     enddo
     return
 end
-	
+
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calplm( l,m,x,plm )
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     integer:: l,m,i
     double precision:: x,plm(3),pmm,somx2,fact
     !

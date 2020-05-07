@@ -24,6 +24,7 @@ SUBROUTINE GLU( A, N, N1, B, EPS, WK, IP, IER )
     !        WORKING  -
     !             WK(N)    R *8  : 1-DIM. ARRAY.
     ! modified : Kensuke Konishi 2018 in Paris
+    implicit none
     INTEGER:: N,N1
     INTEGER:: IP(N),IER
     double precision:: EPS

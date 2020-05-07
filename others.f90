@@ -1,10 +1,10 @@
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax,nlayer,&
-    nzone,vrmin,vrmax,rho,   vpv,vph,vsv,vsh,eta,qmu,qkappa,&
+    nzone,vrmin,vrmax,rho, vpv,vph,vsv,vsh,eta,qmu,qkappa,&
     r0,eqlat,eqlon,mt,nr,theta,phi,lat,lon,output)
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Parameter Input
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! Parameter Input
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: maxnlay,maxnzone,maxnr
     integer:: np
@@ -19,9 +19,8 @@ subroutine pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax
     character(80):: output(*)
     integer:: i
     character(80):: dummy,tmpfile
-    !
     data tmpfile / 'workpsv' /
-    !
+
     ! temporary file open
     open( unit=11, file=tmpfile, status='unknown' )
 ! writing to the temporary file
@@ -47,7 +46,7 @@ subroutine pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax
     omegai = - dlog(omegai) / tlen
     read(11,*) imin,imax
     read(11,*) nzone
-    if ( nzone>maxnzone )  stop 'nzone is too large. (pinput)'
+    if ( nzone>maxnzone ) stop 'nzone is too large. (pinput)'
     do i=1,nzone
         read(11,*) vrmin(i),vrmax(i),&
             rho(1,i),rho(2,i),rho(3,i),rho(4,i),&
@@ -75,11 +74,10 @@ subroutine pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax
     enddo
     ! temporary file close
     close(11)
-    !
     call unlink(tmpfile)
     return
-end
-!
+    end
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calthetaphi(ievla,ievlo,istla,istlo,theta,phi)
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -96,26 +94,26 @@ subroutine calthetaphi(ievla,ievlo,istla,istlo,theta,phi)
     !
     evla = 90.d0 - ievla
     stla = 90.d0 - istla
-    !
+
     evla = evla / 1.8d2 * pi
     evlo = ievlo / 1.8d2 * pi
     stla = stla / 1.8d2 * pi
     stlo = istlo / 1.8d2 * pi
-    !
+
     gcarc = dacos( dcos(evla) * dcos(stla)&
         + dsin(evla) * dsin(stla) * dcos(evlo - stlo) )
-    !
+
     tc = ( dcos(stla) * dsin(evla) - dsin(stla) * dcos(evla) * dcos(stlo - evlo) )&
         &     / dsin(gcarc)
     ts = dsin(stla) * dsin(stlo - evlo) / dsin(gcarc)
-    !
+
     az = dacos(tc)
     if( ts < 0.d0 ) az = -1.d0 * az
-    !
+
     az = az * 1.8d2 / pi
 
     gcarc = gcarc * 1.8d2 / pi
-    !
+
     theta = gcarc
     phi   = 180.d0 - az
     return
@@ -127,10 +125,10 @@ subroutine translat(geodetic,geocentric)
     double precision,parameter :: flattening = 1.d0 / 298.25d0
     double precision,parameter :: pi = 3.1415926535897932d0
     double precision:: geocentric, geodetic
-      
+
     double precision:: tmp
     integer:: flag
-    !      read(5,*) geodetic
+
     flag = 0
     if(geodetic > 90.d0) then
         geodetic = 1.8d2 - geodetic
@@ -145,14 +143,13 @@ subroutine translat(geodetic,geocentric)
     if(flag == 1) then
         geocentric = 1.8d2 - geocentric
     endif
-    !      write(6,*) 'geocentric latitude', geocentric
     return
-end
+    end
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calnl( nzone,vs,iphase,nsl,nll )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! counting of nsl and nll.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! counting of nsl and nll.
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     integer:: nzone,iphase(*),nsl,nll
     double precision:: vs(4,*)
     integer:: i
@@ -176,29 +173,28 @@ end
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calgrid( nzone,vrmin,vrmax,vp,vs,rmin,rmax,&
     imax,lmin,tlen,vmin,gridpar,dzpar )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     double precision, parameter:: pi=3.1415926535897932d0
-    !
     integer:: nzone,imax,lmin
     double precision:: vrmin(*),vrmax(*),vp(4,*),vs(4,*)
     double precision:: rmin,rmax,tlen,vmin(*),gridpar(*),dzpar(*)
     integer:: izone,i,j
     double precision:: coef1,coef2,v(4),vs1,vs2,rh,omega,amax,gtmp
-    !
-    do  izone=1,nzone
+
+    do izone=1,nzone
         ! computing the S-velocity at each zone
         if ( vs(1,izone)==0.d0 ) then
-            do  i=1,4
+            do i=1,4
                 v(i) = vp(i,izone)
             enddo
         else
-            do  i=1,4
+            do i=1,4
                 v(i) = vs(i,izone)
             enddo
         endif
         vs1 = 0.d0
         vs2 = 0.d0
-        do   j=1,4
+        do j=1,4
             if ( j==1 ) then
                 coef1 = 1.d0
             else
@@ -235,10 +231,10 @@ subroutine calgrid( nzone,vrmin,vrmax,vp,vs,rmin,rmax,&
     enddo
     ! rearangement of gridpar
     gtmp = 0.d0
-    do  izone=1,nzone
+    do izone=1,nzone
         gtmp = gtmp + gridpar(izone)
     enddo
-    do  izone=1,nzone
+    do izone=1,nzone
         if ( gridpar(izone)>0.d0 ) then
             gridpar(izone) = gridpar(izone) / gtmp
         else
@@ -248,7 +244,7 @@ subroutine calgrid( nzone,vrmin,vrmax,vp,vs,rmin,rmax,&
     enddo
     ! re-rearangement of gridpar
     gtmp = 0.d0
-    do   izone=1,nzone
+    do izone=1,nzone
         gtmp = gtmp + gridpar(izone)
     enddo
     do izone=1,nzone
@@ -263,12 +259,11 @@ subroutine calra( maxnlay,maxnslay,maxnllay,maxnzone,&
     nlayer,inlayer,jnlayer,jnslay,jnllay,&
     gridpar,dzpar,nzone,vrmin,vrmax,iphase,&
     rmin,rmax,r0,nslay,nllay,nnl,ra,re )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Computing the number and the location of grid points.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! Computing the number and the location of grid points.
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     double precision, parameter:: pi=3.1415926535897932d0
-    !
     integer:: maxnlay,maxnslay,maxnllay,maxnzone
     integer:: nlayer,inlayer,jnlayer,jnslay,jnllay
     integer:: nzone,iphase(*),nslay,nllay,nnl(maxnzone)
@@ -276,17 +271,15 @@ subroutine calra( maxnlay,maxnslay,maxnllay,maxnzone,&
     double precision:: ra(maxnlay+maxnzone+1)
     integer:: izone,itmp,i,ntmp
     double precision:: rh,re
-    !
+
     ! Initializing the data
     nslay = 0
     nllay = 0
     inlayer = 0
-    do i=1,maxnlay+maxnzone+1
-        ra(i) = 0.d0
-    enddo
-    do  izone=1,nzone
-        nnl(izone) = 0
-    enddo
+    ra(1:maxnlay+maxnzone+1)=0
+
+    nnl(1:nzone)=0
+
     jnlayer = 0
     jnslay = 0
     jnllay = 0
@@ -295,7 +288,7 @@ subroutine calra( maxnlay,maxnslay,maxnllay,maxnzone,&
     ! computing the number and the location of the grid points
     ra(1) = rmin
     itmp = 1
-    do   izone=1,nzone
+    do izone=1,nzone
         rh = vrmax(izone) - vrmin(izone)
         if(dzpar(izone)==0.d0) then
             ntmp = 1
@@ -303,7 +296,7 @@ subroutine calra( maxnlay,maxnslay,maxnllay,maxnzone,&
             ntmp = int( sqrt(3.3d0 / re ) * rh / dzpar(izone)&
                 / 2.d0 / pi  / 7.d-1 + 1 )
         endif
-        !                             ! ntmp (see Geller & Takeuchi 1995 6.2)
+        ! ntmp (see Geller & Takeuchi 1995 6.2)
         !	  nnl(izone) = dint( dble(nlayer) * gridpar(izone) ) + 1
         nnl(izone) = ntmp
         if ( nnl(izone)<5 ) nnl(izone)=5
@@ -335,9 +328,9 @@ subroutine calsp( maxnzone,ndc,nsl,nll,&
     iphase,nlayer,nslay,nllay,&
     isp,jsp,ksp,issp,ilsp,lsp,jssp,&
     isdr,jsdr,ildr,jdr,kdr )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Computing the stack points.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! Computing the stack points.
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     integer:: maxnzone
     integer:: ndc,nsl,nll,iphase(*),nlayer(maxnzone)
     integer:: nslay,nllay
@@ -348,15 +341,14 @@ subroutine calsp( maxnzone,ndc,nsl,nll,&
     integer:: i,isl,ill
     !
     ! Initialization of the data
-    do   i=1,maxnzone
-        isp(i)  = 0
-        jsp(i)  = 0
-        ksp(i)  = 0
-        issp(i) = 0
-        ilsp(i) = 0
-        lsp(i)  = 0
-        jssp(i) = 0
-    enddo
+    isp = 0
+    jsp = 0
+    ksp = 0
+    issp = 0
+    ilsp = 0
+    lsp  = 0
+    jssp = 0
+
     isdr = 0
     jsdr = 0
     ildr = 0
@@ -400,24 +392,24 @@ subroutine calsp( maxnzone,ndc,nsl,nll,&
     ildr = ildr + 4 * nllay
     jdr =  jdr  + jsp(ndc+1)-1 + 16 * nlayer(ndc+1)
     kdr =  kdr + ksp(ndc+1)-1 + 2 * ( nlayer(ndc+1)+1 )
-    !
     return
-end
-!
+    end
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calspo( maxnlay,maxnzone,&
     ndc,rdc,iphase,inlayer,&
     r0,rmin,rmax,ra,isp,spo,spn )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Computing the source location.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! Computing the source location.
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     integer:: maxnlay,maxnzone,ndc,iphase(*)
     integer:: inlayer,isp(maxnzone),spn
     double precision:: rdc(*),r0,rmin,rmax,ra(maxnlay+maxnzone+1),spo
     integer:: itmp,idr
     !
     ! checking the parameter
-    if ( (r0<rmin).or.(r0>rmax) )   stop 'The source location is improper.(calspo)'
+    if ( (r0<rmin).or.(r0>rmax) ) stop 'The source location is improper.(calspo)'
     spo = 0
     ! computing 'spo'
     if ( r0==rmax ) then
@@ -426,153 +418,55 @@ subroutine calspo( maxnlay,maxnzone,&
     else
         itmp = 2
 110 continue
-    if ( r0<ra(itmp) ) then
-    continue
-else
-    itmp = itmp + 1
-    goto 110
-endif
-spo = dble(itmp-2)+ ( r0-ra(itmp-1) )   / ( ra(itmp)-ra(itmp-1) )
-! temporal handling
-if ( (spo-dble(itmp-2))<0.01d0 ) then
-    spo = dble(itmp-2) + 0.01d0
-    r0 = ra(itmp-1)+ (spo-dble(itmp-2)) * ( ra(itmp)-ra(itmp-1) )
-endif
-if ( (spo-dble(itmp-2))>0.99d0 ) then
-    spo = dble(itmp-2) + 0.99d0
-    r0 = ra(itmp-1) + (spo-dble(itmp-2)) * ( ra(itmp)-ra(itmp-1) )
-endif
-endif
+        if ( r0<ra(itmp) ) then
+            continue
+        else
+           itmp = itmp + 1
+            goto 110
+        endif
+        spo = dble(itmp-2)+ ( r0-ra(itmp-1) )   / ( ra(itmp)-ra(itmp-1) )
+    ! temporal handling
+        if ( (spo-dble(itmp-2))<0.01d0 ) then
+            spo = dble(itmp-2) + 0.01d0
+            r0 = ra(itmp-1)+ (spo-dble(itmp-2)) * ( ra(itmp)-ra(itmp-1) )
+        endif
+        if ( (spo-dble(itmp-2))>0.99d0 ) then
+            spo = dble(itmp-2) + 0.99d0
+            r0 = ra(itmp-1) + (spo-dble(itmp-2)) * ( ra(itmp)-ra(itmp-1) )
+        endif
+    endif
 ! computing 'spn'
-spn = 0
-itmp = 1
+    spn = 0
+    itmp = 1
 130 continue
     if ( iphase(itmp)==1 ) then
         spn = spn + 1
         if ( r0<=rdc(itmp) ) then
-        continue
+          continue
+        else
+            itmp = itmp + 1
+            goto 130
+        endif
     else
+        spn = spn + 1
+        if ( r0<=rdc(itmp) ) stop 'The source is in the liquid layer.(calspo)'
         itmp = itmp + 1
         goto 130
     endif
-else
-    spn = spn + 1
-    if ( r0<=rdc(itmp) )  stop 'The source is in the liquid layer.(calspo)'
-    itmp = itmp + 1
-    goto 130
-endif
 ! changing 'spo'
-spo = spo - dble( isp(spn) - 1 )
-!
-return
-end
-!
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine xmatinit( maxnslay,maxnllay,maxnzone,&
-    a,t,h1x,h1y,h1z,h2L,h2N,&
-    h3ax,h3ay,h3az,h4aL,h4aN,&
-    h5ax,h5ay,h5az,h6aL,h6aN,&
-    h3x,h3y,h3z,h4L,h4N,&
-    h5x,h5y,h5z,h6L,h6N,&
-    h7x,h7y,h7z,h8L,h8N,&
-    h3mx,h3my,h3mz,h5mx,h5my,h5mz,&
-    h4m1L,h4m1N,h4m2L,h4m2N,&
-    h6m1L,h6m1N,h6m2L,h6m2N,&
-    p1,p2,p3 )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    integer:: maxnslay,maxnllay,maxnzone
-    complex(kind(0d0)):: a( 4, 2*(maxnslay+1) + (maxnllay+1) )
-    double precision::  t(8*maxnslay)
-    double precision:: h1x( 8*maxnslay ),h1y( 8*maxnslay ),h1z( 8*maxnslay )
-    double precision:: h2L( 8*maxnslay ),h2N( 8*maxnslay )
-    double precision:: h3ax( 8*maxnslay )
-    double precision:: h3ay( 8*maxnslay ),h3az( 8*maxnslay )
-    double precision:: h4aL( 8*maxnslay ),h4aN( 8*maxnslay )
-    double precision:: h5ax( 8*maxnslay ),h5ay( 8*maxnslay ),h5az( 8*maxnslay )
-    double precision:: h6aL( 8*maxnslay ),h6aN( 8*maxnslay )
-    double precision:: h3x( 8*maxnslay ),h3y( 8*maxnslay ),h3z( 8*maxnslay )
-    double precision:: h4L( 8*maxnslay ),h4N( 8*maxnslay )
-    double precision:: h5x( 8*maxnslay ),h5y( 8*maxnslay ),h5z( 8*maxnslay )
-    double precision:: h6L( 8*maxnslay ),h6N( 8*maxnslay )
-    double precision:: h7x( 8*maxnslay ),h7y( 8*maxnslay ),h7z( 8*maxnslay )
-    double precision:: h8L( 8*maxnslay ),h8N( 8*maxnslay )
-    double precision::  h3mx( -2:1,2*(maxnslay+maxnzone) )
-    double precision::  h3my( -2:1,2*(maxnslay+maxnzone) )
-    double precision::  h3mz( -2:1,2*(maxnslay+maxnzone) )
-    double precision::  h5mx( -1:2,2*(maxnslay+maxnzone) )
-    double precision::  h5my( -1:2,2*(maxnslay+maxnzone) )
-    double precision::  h5mz( -1:2,2*(maxnslay+maxnzone) )
-    double precision:: h4m1L( -1:2,2*(maxnslay+maxnzone) )
-    double precision:: h4m1N( -1:2,2*(maxnslay+maxnzone) )
-    double precision:: h4m2L( -2:1,2*(maxnslay+maxnzone) )
-    double precision:: h4m2N( -2:1,2*(maxnslay+maxnzone) )
-    double precision:: h6m1L( -1:2,2*(maxnslay+maxnzone) )
-    double precision:: h6m1N( -1:2,2*(maxnslay+maxnzone) )
-    double precision:: h6m2L( -2:1,2*(maxnslay+maxnzone) )
-    double precision:: h6m2N( -2:1,2*(maxnslay+maxnzone) )
-    double precision:: p1(8*maxnllay),p2(8*maxnllay),p3(8*maxnllay)
-    !
-    call cmatinit( 4,2*(maxnslay+1)+(maxnllay+1),a )
-    call vecinit( 8*maxnslay,t )
-    call vecinit( 8*maxnslay,h1x )
-    call vecinit( 8*maxnslay,h1y )
-    call vecinit( 8*maxnslay,h1z )
-    call vecinit( 8*maxnslay,h2L )
-    call vecinit( 8*maxnslay,h2N )
-    call vecinit( 8*maxnslay,h3ax )
-    call vecinit( 8*maxnslay,h3ay )
-    call vecinit( 8*maxnslay,h3az )
-    call vecinit( 8*maxnslay,h4aL )
-    call vecinit( 8*maxnslay,h4aN )
-    call vecinit( 8*maxnslay,h5ax )
-    call vecinit( 8*maxnslay,h5ay )
-    call vecinit( 8*maxnslay,h5az )
-    call vecinit( 8*maxnslay,h6aL )
-    call vecinit( 8*maxnslay,h6aN )
-    call vecinit( 8*maxnslay,h3x )
-    call vecinit( 8*maxnslay,h3y )
-    call vecinit( 8*maxnslay,h3z )
-    call vecinit( 8*maxnslay,h4L )
-    call vecinit( 8*maxnslay,h4N )
-    call vecinit( 8*maxnslay,h5x )
-    call vecinit( 8*maxnslay,h5y )
-    call vecinit( 8*maxnslay,h5z )
-    call vecinit( 8*maxnslay,h6L )
-    call vecinit( 8*maxnslay,h6N )
-    call vecinit( 8*maxnslay,h7x )
-    call vecinit( 8*maxnslay,h7y )
-    call vecinit( 8*maxnslay,h7z )
-    call vecinit( 8*maxnslay,h8L )
-    call vecinit( 8*maxnslay,h8N )
-    call matinit( 4,2*(maxnslay+maxnzone),h3mx(-2,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h3my(-2,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h3mz(-2,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h4m2L(-2,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h4m2N(-2,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h6m2L(-2,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h6m2N(-2,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h5mx(-1,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h5my(-1,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h5mz(-1,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h4m1L(-1,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h4m1N(-1,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h6m1L(-1,1) )
-    call matinit( 4,2*(maxnslay+maxnzone),h6m1N(-1,1) )
-    call vecinit( 8*maxnllay,p1 )
-    call vecinit( 8*maxnllay,p2 )
-    call vecinit( 8*maxnllay,p3 )
-    !
+    spo = spo - dble( isp(spn) - 1 )
+
     return
-end
-!
+    end
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calstg( maxnlay,maxnzone, nzone,iphase,rrho,&
     vpv,vph,vsv,vsh,eta,nnl,ra,rmax,&
     vnp,vra,rho,kappa,ecKx,ecKy,ecKz,&
     mu,ecL,ecN, r0,spn,ecC0,ecF0,ecL0 )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Computing the structure grid points.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! Computing the structure grid points.
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     integer:: maxnlay,maxnzone,nzone,iphase(*),nnl(*),vnp,spn
     double precision:: rrho(4,*),vpv(4,*),vph(4,*),vsv(4,*),vsh(4,*),eta(4,*)
     double precision:: ra(*),rmax
@@ -584,15 +478,15 @@ subroutine calstg( maxnlay,maxnzone, nzone,iphase,rrho,&
     integer:: izone,i,j,itmp,jtmp
     !
     ! initializing the data
-    call vecinit( maxnlay+2*maxnzone+1,vra )
-    call vecinit( maxnlay+2*maxnzone+1,rho )
-    call vecinit( maxnlay+2*maxnzone+1,kappa )
-    call vecinit( maxnlay+2*maxnzone+1,ecKx )
-    call vecinit( maxnlay+2*maxnzone+1,ecKy )
-    call vecinit( maxnlay+2*maxnzone+1,ecKz )
-    call vecinit( maxnlay+2*maxnzone+1,mu )
-    call vecinit( maxnlay+2*maxnzone+1,ecL )
-    call vecinit( maxnlay+2*maxnzone+1,ecN )
+    vra(1: maxnlay+2*maxnzone+1)=0
+    rho(1: maxnlay+2*maxnzone+1)=0
+    kappa(1: maxnlay+2*maxnzone+1)=0
+    ecKx(1: maxnlay+2*maxnzone+1)=0
+    ecKy(1: maxnlay+2*maxnzone+1 )=0
+    ecKz(1: maxnlay+2*maxnzone+1 )=0
+    mu(1: maxnlay+2*maxnzone+1 )=0
+    ecL(1: maxnlay+2*maxnzone+1 )=0
+    ecN(1: maxnlay+2*maxnzone+1 )=0
     ! computing the structure grid points
     itmp = 0
     jtmp = 0
@@ -662,14 +556,12 @@ subroutine calstg( maxnlay,maxnzone, nzone,iphase,rrho,&
     !
     return
 end
-!
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine caltstg( maxnlay,maxnzone,&
-    nzone,rrho,vpv,vph,vsv,vsh,eta,&
-    nnl,ra,rmax, tvra,tkappa,tecKx,tecKy,tecKz,tmu,tecL,tecN)
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Computing the structure grid points.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+subroutine caltstg( maxnlay,maxnzone,nzone,rrho,vpv,vph,vsv,vsh,eta,nnl,ra,rmax,tvra,tkappa,tecKx,tecKy,tecKz,tmu,tecL,tecN)
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! Computing the structure grid points.
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: maxnlay,maxnzone,nzone,nnl(*)
     double precision:: rrho(4,*),vpv(4,*),vph(4,*),vsv(4,*),vsh(4,*),eta(4,*)
@@ -680,14 +572,14 @@ subroutine caltstg( maxnlay,maxnzone,&
     double precision:: ecA,ecC,ecF
     integer:: izone,i,j,itmp,jtmp
     !
-    call vecinit( maxnlay+2*maxnzone+1,tvra )
-    call vecinit( maxnlay+2*maxnzone+1,tkappa )
-    call vecinit( maxnlay+2*maxnzone+1,tecKx )
-    call vecinit( maxnlay+2*maxnzone+1,tecKy )
-    call vecinit( maxnlay+2*maxnzone+1,tecKz )
-    call vecinit( maxnlay+2*maxnzone+1,tmu )
-    call vecinit( maxnlay+2*maxnzone+1,tecL )
-    call vecinit( maxnlay+2*maxnzone+1,tecN )
+    tvra(1:maxnlay+2*maxnzone+1)=0
+    tkappa(1:maxnlay+2*maxnzone+1)=0
+    tecKx(1:maxnlay+2*maxnzone+1)=0
+    tecKy(1:maxnlay+2*maxnzone+1)=0
+    tecKz(1:maxnlay+2*maxnzone+1)=0
+    tmu(1:maxnlay+2*maxnzone+1)=0
+    tecL(1:maxnlay+2*maxnzone+1)=0
+    tecN(1:maxnlay+2*maxnzone+1)=0
     ! computing the structure grid points
     itmp = 0
     jtmp = 0
@@ -728,50 +620,28 @@ subroutine caltstg( maxnlay,maxnzone,&
         enddo
         jtmp = jtmp - 1
     enddo
-    !
     return
 end
-!
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calinv(vnp,rho,kappa,rhoinv,kappainv)
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Computing the inverse of density and elastic constant.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    integer:: vnp,i
-    double precision:: rho(*),kappa(*),rhoinv(*),kappainv(*)
-    !
-    do   i=1,vnp
-        rhoinv(i)   = 1.d0 / rho(i)
-        kappainv(i) = 1.d0 / kappa(i)
-    enddo
-    !
-    return
-end
-!
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine submat( nlayer,ha,hb,h )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Subtracting matrix `hb' from matrix `ha'.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+! Subtracting matrix `hb' from matrix `ha'.
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     integer:: nlayer
     double precision:: ha(*),hb(*),h(*)
-    integer:: i
-    !
-    do  i=1,4*nlayer
-        h(i) = ha(i) - hb(i)
-    enddo
-    !
+
+    h(1:4*nlayer) = ha(1:4*nlayer) - hb(1:4*nlayer)
     return
-end
-!
+    end
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calspdr( maxnzone,nzone,iphase,nlayer,&
-    &	                    jjdr,kkdr )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+subroutine calspdr( maxnzone,nzone,iphase,nlayer,jjdr,kkdr )
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     integer:: maxnzone,nzone,iphase(*)
     integer:: nlayer(maxnzone),jjdr(*),kkdr(*)
     integer:: izone
-    !
     jjdr(1) = 1
     kkdr(1) = 1
     do  izone=1,nzone-1
@@ -791,16 +661,14 @@ subroutine calspdr( maxnzone,nzone,iphase,nlayer,&
             endif
         endif
     enddo
-    !
     return
 end
-!
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calmdr( omega,l,nzone,vrmin,vrmax,vmin,dzpar,&
-    rmax,sufzone )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+subroutine calmdr( omega,l,nzone,vrmin,vrmax,vmin,dzpar,rmax,sufzone )
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     double precision,parameter ::pi=3.1415926535897932d0
-    !
     integer:: l,nzone,sufzone
     double precision:: omega,vrmin(*),vrmax(*),vmin(*),dzpar(*),rmax
     integer:: izone
@@ -828,36 +696,38 @@ end
 !
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calu0( c0,bvec,u )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     complex(kind(0d0)):: c0,bvec,u
-    !
+
     u = u + c0 * bvec
-    !
+
     return
-end
-!
+    end
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calu( c0,lsq,bvec,u )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     double precision:: lsq
     complex(kind(0d0)) c0(2),bvec(3),u(3)
-    !
+
     u(1) = u(1) + c0(1) * bvec(1)
     u(2) = u(2) + c0(2) * bvec(2) / dcmplx(lsq)
     u(3) = u(3) + c0(2) * bvec(3) / dcmplx(lsq)
-    !
+
     return
 end
-!
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calamp( g,l,lsuf,maxamp,ismall,ratl )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: ismall,l,lsuf
     double precision:: maxamp,ratl
     complex(kind(0d0)) g(2)
     double precision:: amp,ampratio
-    !
+
     ampratio = 0.d0
     amp = dsqrt( cdabs( g(1) )**2 + cdabs( g(2) )**2 )
     if ( amp>maxamp ) maxamp = amp
@@ -867,88 +737,23 @@ subroutine calamp( g,l,lsuf,maxamp,ismall,ratl )
     else
         ismall = 0
     endif
-    !
     return
 end
-!
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine matinit( n1,n2,a )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    integer:: n1,n2,i,j
-    double precision:: a(n1,*)
-    !
-    do  j=1,n2
-        do  i=1,n1
-            a(i,j) = 0.d0
-        enddo
-    enddo
-    !
-    return
-end
-!
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine cmatinit( n1,n2,a )
-    !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    integer:: n1,n2,i,j
-    complex(kind(0d0)) a(n1,*)
-    !
-    do j=1,n2
-        do i=1,n1
-            a(i,j) = dcmplx( 0.d0 )
-        enddo
-    enddo
 
-    return
-end
-!
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine vecinit( nn,b )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Filling zero to the vector 'g'.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    integer:: nn,i
-    double precision:: b(*)
-    !
-    do i=1,nn
-        b(i) = 0.d0
-    enddo
-    !
-    return
-end
-!
+subroutine calcutd(nzone,nnl,tmpc,rat,nn,iphase,spo,spn,ra,kkdr,kc)
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine cvecinit( nn,b )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    ! Filling zero to the vector 'g'.
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    integer:: nn,i
-    complex(kind(0d0)) ::b(*)
-    !
-    do i=1,nn
-        b(i) = dcmplx( 0.d0 )
-    enddo
-    !
-    return
-end
-!
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calcutd(nzone,nnl,tmpc,rat,nn,iphase,spo,spn,&
-    ra,kkdr,kc)
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     integer:: nzone,nn,spn,kkdr(*),kc,iphase(*),nnl(*)
     complex(kind(0d0)) ::tmpc(*)
     double precision:: rat,spo,ra(*)
     integer:: nc
-    !
     double precision:: cU(nn),cV(nn),rc
     double precision:: maxamp,amp(nn)
     integer:: iz,jz,jj,i,ml(nzone),tzone
-    !
-    do   jj=1,nn
-        cU(jj) = 0.d0
-        cV(jj) = 0.d0
-    enddo
-    !
+
+    cU = 0
+    cV = 0
+
     iz = 2
     jz = 1
     do  jj=1,nn
@@ -984,7 +789,7 @@ subroutine calcutd(nzone,nnl,tmpc,rat,nn,iphase,spo,spn,&
         endif
     enddo
 140 continue
-    !
+
     i = 1
     do jj=1,nzone
         i = i + nnl(jj)
@@ -994,10 +799,10 @@ subroutine calcutd(nzone,nnl,tmpc,rat,nn,iphase,spo,spn,&
     do jj=nzone,1,-1
         if(ml(jj)>nc) tzone = jj
     enddo
-    !
+
     rc = ra(nc)
-    !
-    do   i=1,jz-1
+
+    do i=1,jz-1
         if( (ra(i)<=rc).and.(rc<ra(i+1)) ) then
             nc = i
             if(tzone==1) then ! case(tzone is innermost zone)
@@ -1019,17 +824,16 @@ end
 !
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine callsuf(omega,nzone,vrmax,vsv,lsuf)
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    !
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: nzone,lsuf
     double precision:: omega,vrmax(*),vsv(4,*)
-    !
+
     double precision:: tvs,coef
     integer:: i
-    !
+
     tvs = 0.d0
-    do   i=1,4
+    do i=1,4
         if(i==1) then
             coef = 1.d0
         else
@@ -1037,7 +841,7 @@ subroutine callsuf(omega,nzone,vrmax,vsv,lsuf)
         endif
         tvs = tvs + ( vsv(i,nzone) ) * coef
     enddo
-    !
+
     lsuf = int(omega * vrmax(nzone) / tvs - 0.5d0) + 1
     return
 end
