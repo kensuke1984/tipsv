@@ -157,7 +157,7 @@ allocate(mpimin(PETOT), mpimax(PETOT))
 ! *************** Inputting and computing the parameters ***************
 ! --- inputting parameter ---
 if (my_rank ==0) then
-    call pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax,&
+    call pinput2(maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax,&
         nzone,vrmin,vrmax,rrho,vpv,vph,vsv,vsh,eta,qmu,qkappa,&
         r0,eqlat,eqlon,mt,nr,theta,phi,lat,lon,output)
 endif
