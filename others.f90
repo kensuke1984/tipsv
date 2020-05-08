@@ -1,5 +1,5 @@
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax,nlayer,&
+subroutine pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax,&
     nzone,vrmin,vrmax,rho, vpv,vph,vsv,vsh,eta,qmu,qkappa,&
     r0,eqlat,eqlon,mt,nr,theta,phi,lat,lon,output)
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -8,7 +8,7 @@ subroutine pinput2( maxnlay,maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax
     implicit none
     integer:: maxnlay,maxnzone,maxnr
     integer:: np
-    integer:: imin,imax,nlayer(*)
+    integer:: imin,imax
     integer:: nzone,nr
     double precision:: tlen,omegai,re,ratc,ratl
     double precision:: vrmin(*),vrmax(*),rho(4,*)
@@ -83,66 +83,60 @@ subroutine calthetaphi(ievla,ievlo,istla,istlo,theta,phi)
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     double precision,parameter:: pi = 3.1415926535897932d0
-    !
-    double precision:: ievla,ievlo,istla,istlo
+    double precision,intent(in):: ievla,ievlo,istla,istlo
+    double precision,intent(out):: theta,phi
     double precision:: evla,evlo,stla,stlo
-    double precision:: theta,phi
-    double precision:: gcarc,az
-    double precision:: tc,ts
-    !
+    double precision:: gcarc,az,tc,ts
+
     ! transformation to spherical coordinates
-    !
-    evla = 90.d0 - ievla
-    stla = 90.d0 - istla
+    evla = 90 - ievla
+    stla = 90 - istla
 
-    evla = evla / 1.8d2 * pi
-    evlo = ievlo / 1.8d2 * pi
-    stla = stla / 1.8d2 * pi
-    stlo = istlo / 1.8d2 * pi
+    evla = evla / 180 * pi
+    evlo = ievlo / 180 * pi
+    stla = stla / 180 * pi
+    stlo = istlo / 180 * pi
 
-    gcarc = dacos( dcos(evla) * dcos(stla)&
-        + dsin(evla) * dsin(stla) * dcos(evlo - stlo) )
+    gcarc = dacos(dcos(evla) * dcos(stla)+dsin(evla)*dsin(stla)*dcos(evlo-stlo))
 
-    tc = ( dcos(stla) * dsin(evla) - dsin(stla) * dcos(evla) * dcos(stlo - evlo) )&
-        &     / dsin(gcarc)
+    tc = (dcos(stla)*dsin(evla)-dsin(stla)*dcos(evla)*dcos(stlo-evlo))/dsin(gcarc)
     ts = dsin(stla) * dsin(stlo - evlo) / dsin(gcarc)
 
     az = dacos(tc)
-    if( ts < 0.d0 ) az = -1.d0 * az
+    if( ts < 0 ) az = - az
 
-    az = az * 1.8d2 / pi
+    az = az * 180 / pi
 
-    gcarc = gcarc * 1.8d2 / pi
+    gcarc = gcarc * 180 / pi
 
     theta = gcarc
-    phi   = 180.d0 - az
+    phi   = 180 - az
     return
 end
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine translat(geodetic,geocentric)
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     double precision,parameter :: flattening = 1.d0 / 298.25d0
     double precision,parameter :: pi = 3.1415926535897932d0
-    double precision:: geocentric, geodetic
-
-    double precision:: tmp
+    double precision,intent(in):: geodetic
+    double precision,intent(out):: geocentric
+    double precision:: tmp_geodetic
     integer:: flag
 
     flag = 0
-    if(geodetic > 90.d0) then
-        geodetic = 1.8d2 - geodetic
+    tmp_geodetic=geodetic
+    if(90<geodetic ) then
+        tmp_geodetic = 180 - geodetic
         flag = 1
     endif
-    !
-    geodetic = geodetic / 1.8d2 * pi
-    geocentric = datan( (1.d0 - flattening) * (1.d0 - flattening)&
-        * dtan(geodetic) )
-    geocentric = geocentric * 1.8d2 / pi
+
+    tmp_geodetic = tmp_geodetic / 180 * pi
+    geocentric = datan((1-flattening)*(1-flattening)*dtan(tmp_geodetic))
+    geocentric = geocentric * 180 / pi
     !      if(geocentric < 0.d0 ) geocentric = 1.8d2 + geocentric
-    if(flag == 1) then
-        geocentric = 1.8d2 - geocentric
-    endif
+    if(flag == 1) geocentric = 180 - geocentric
+
     return
     end
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -169,7 +163,7 @@ subroutine calnl( nzone,vs,iphase,nsl,nll )
     !
     return
 end
-!
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calgrid( nzone,vrmin,vrmax,vp,vs,rmin,rmax,&
     imax,lmin,tlen,vmin,gridpar,dzpar )
