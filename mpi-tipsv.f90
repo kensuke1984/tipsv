@@ -306,22 +306,28 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
             itmp = isdr+issp(isl)
             call calmatc( nlayer(i),vnp,vra,rho,2,0,0,ra(isp(i)), t(itmp) )
             call caltl( nlayer(i),vnp,vra,rho,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i), t(itmp),work(itmp), t(itmp) )
+            !call calt( nlayer(i), t(itmp),work(itmp), t(itmp) )
+            t(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+t(itmp:itmp+4*nlayer(i)-1))/2
             call calmatc( nlayer(i),vnp,vra,ecKx,0,0,0,ra(isp(i)),h1x(itmp) )
             call calhl( nlayer(i),vnp,vra,ecKx,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i), h1x(itmp),work(itmp),h1x(itmp) )
+            !call calt( nlayer(i), h1x(itmp),work(itmp),h1x(itmp) )
+            h1x(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h1x(itmp:itmp+4*nlayer(i)-1))/2
             call calmatc( nlayer(i),vnp,vra,ecKy,0,0,0,ra(isp(i)),h1y(itmp) )
             call calhl( nlayer(i),vnp,vra,ecKy,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i), h1y(itmp),work(itmp),h1y(itmp) )
+            !call calt( nlayer(i), h1y(itmp),work(itmp),h1y(itmp) )
+            h1y(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h1y(itmp:itmp+4*nlayer(i)-1))/2
             call calmatc( nlayer(i),vnp,vra,ecKz,0,0,0,ra(isp(i)),h1z(itmp) )
             call calhl( nlayer(i),vnp,vra,ecKz,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i), h1z(itmp),work(itmp),h1z(itmp) )
+         !   call calt( nlayer(i), h1z(itmp),work(itmp),h1z(itmp) )
+            h1z(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h1z(itmp:itmp+4*nlayer(i)-1))/2
             call calmatc( nlayer(i),vnp,vra,ecL,0,0,0,ra(isp(i)),h2L(itmp) )
             call calhl( nlayer(i),vnp,vra,ecL,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i), h2L(itmp),work(itmp),h2L(itmp) )
+        !    call calt( nlayer(i), h2L(itmp),work(itmp),h2L(itmp) )
+            h2L(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h2L(itmp:itmp+4*nlayer(i)-1))/2
             call calmatc( nlayer(i),vnp,vra,ecN,0,0,0,ra(isp(i)),h2N(itmp) )
             call calhl( nlayer(i),vnp,vra,ecN,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i), h2N(itmp),work(itmp),h2N(itmp) )
+            !call calt( nlayer(i), h2N(itmp),work(itmp),h2N(itmp) )
+            h2N(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h2N(itmp:itmp+4*nlayer(i)-1))/2
             call calmatc( nlayer(i),vnp,vra,ecKx,1,0,1,ra(isp(i)),h5ax(itmp) )
             call calmatc( nlayer(i),vnp,vra,ecKy,1,0,1,ra(isp(i)),h5ay(itmp) )
             call calmatc( nlayer(i),vnp,vra,ecKz,1,0,1,ra(isp(i)),h5az(itmp) )
@@ -343,10 +349,12 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
             call calmatc( nlayer(i),vnp,vra,rhoinv,2,1,1,ra(isp(i)),p1(itmp) )
             call calmatc( nlayer(i),vnp,vra,rhoinv,0,0,0,ra(isp(i)),p2(itmp) )
             call calhl( nlayer(i),vnp,vra,rhoinv,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i),p2(itmp),work(itmp),p2(itmp) )
+            !call calt( nlayer(i),p2(itmp),work(itmp),p2(itmp) )
+            p2(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+p2(itmp:itmp+4*nlayer(i)-1))/2
             call calmatc( nlayer(i),vnp,vra,kappainv,2,0,0,ra(isp(i)),p3(itmp) )
             call caltl( nlayer(i),vnp,vra,kappainv,ra(isp(i)),work(itmp) )
-            call calt( nlayer(i),p3(itmp),work(itmp),p3(itmp) )
+        !    call calt( nlayer(i),p3(itmp),work(itmp),p3(itmp) )
+            p3(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+p3(itmp:itmp+4*nlayer(i)-1))/2
         endif
     enddo
     ! Computing the modified operator of the 1st derivative
@@ -632,22 +640,28 @@ do i=1,ndc+1
         itmp = isdr+issp(isl)
         call calmatc( nlayer(i),vnp,vra,rho ,2,0,0,ra(isp(i)), t(itmp) )
         call caltl( nlayer(i),vnp,vra,rho,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i), t(itmp),work(itmp), t(itmp) )
+!        call calt( nlayer(i), t(itmp),work(itmp), t(itmp) )
+        t(itmp:itmp+4*nlayer(i)-1)=(t(itmp:itmp+4*nlayer(i)-1)+work(itmp:itmp+4*nlayer(i)-1))/2d0
         call calmatc( nlayer(i),vnp,vra,ecKx,0,0,0,ra(isp(i)),h1x(itmp) )
         call calhl( nlayer(i),vnp,vra,ecKx,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i), h1x(itmp),work(itmp),h1x(itmp) )
-        call calmatc( nlayer(i),vnp,vra,ecKy,0,0,0,ra(isp(i)),h1y(itmp) )
+     !   call calt( nlayer(i), h1x(itmp),work(itmp),h1x(itmp) )
+        h1x(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h1x(itmp:itmp+4*nlayer(i)-1))/2
+             call calmatc( nlayer(i),vnp,vra,ecKy,0,0,0,ra(isp(i)),h1y(itmp) )
         call calhl( nlayer(i),vnp,vra,ecKy,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i), h1y(itmp),work(itmp),h1y(itmp) )
+        !call calt( nlayer(i), h1y(itmp),work(itmp),h1y(itmp) )
+        h1y(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h1y(itmp:itmp+4*nlayer(i)-1))/2
         call calmatc( nlayer(i),vnp,vra,ecKz,0,0,0,ra(isp(i)),h1z(itmp) )
         call calhl( nlayer(i),vnp,vra,ecKz,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i), h1z(itmp),work(itmp),h1z(itmp) )
+      !  call calt( nlayer(i), h1z(itmp),work(itmp),h1z(itmp) )
+        h1z(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h1z(itmp:itmp+4*nlayer(i)-1))/2
         call calmatc( nlayer(i),vnp,vra,ecL ,0,0,0,ra(isp(i)),h2L(itmp) )
         call calhl( nlayer(i),vnp,vra,ecL,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i), h2L(itmp),work(itmp),h2L(itmp) )
+       ! call calt( nlayer(i), h2L(itmp),work(itmp),h2L(itmp) )
+        h2L(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h2L(itmp:itmp+4*nlayer(i)-1))/2
         call calmatc( nlayer(i),vnp,vra,ecN,0,0,0,ra(isp(i)),h2N(itmp) )
         call calhl( nlayer(i),vnp,vra,ecN,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i), h2N(itmp),work(itmp),h2N(itmp) )
+        !call calt( nlayer(i), h2N(itmp),work(itmp),h2N(itmp) )
+        h2N(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+h2N(itmp:itmp+4*nlayer(i)-1))/2
         call calmatc( nlayer(i),vnp,vra,ecKx,1,0,1,ra(isp(i)),h5ax(itmp) )
         call calmatc( nlayer(i),vnp,vra,ecKy,1,0,1,ra(isp(i)),h5ay(itmp) )
         call calmatc( nlayer(i),vnp,vra,ecKz,1,0,1,ra(isp(i)),h5az(itmp) )
@@ -669,10 +683,12 @@ do i=1,ndc+1
         call calmatc( nlayer(i),vnp,vra,rhoinv,2,1,1,ra(isp(i)),p1(itmp) )
         call calmatc( nlayer(i),vnp,vra,rhoinv,0,0,0,ra(isp(i)),p2(itmp) )
         call calhl( nlayer(i),vnp,vra,rhoinv,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i),p2(itmp),work(itmp),p2(itmp) )
+        !call calt( nlayer(i),p2(itmp),work(itmp),p2(itmp) )
+        p2(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+p2(itmp:itmp+4*nlayer(i)-1))/2
         call calmatc( nlayer(i),vnp,vra,kappainv,2,0,0,ra(isp(i)),p3(itmp) )
         call caltl( nlayer(i),vnp,vra,kappainv,ra(isp(i)),work(itmp) )
-        call calt( nlayer(i),p3(itmp),work(itmp),p3(itmp) )
+        !call calt( nlayer(i),p3(itmp),work(itmp),p3(itmp) )
+        p3(itmp:itmp+4*nlayer(i)-1)=(work(itmp:itmp+4*nlayer(i)-1)+p3(itmp:itmp+4*nlayer(i)-1))/2
     endif
 enddo
 ! Computing the modified operator of the 1st derivative

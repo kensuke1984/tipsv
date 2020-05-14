@@ -35,9 +35,7 @@ SUBROUTINE RK3(NEQ,FUNC,X0,XE,N,Y0,YN,N1,WORK)
     do I = 1,N
         CALL RKSTEP(NEQ,FUNC,X0,H,Y0,YN,WORK(1,1),WORK(1,2))
         X0 = X0 + H
-        do  J = 1,NEQ
-            Y0(J) = YN(J)
-        enddo
+        Y0(1:neq) = YN(1:neq)
     enddo
     X0 = XE
     RETURN
@@ -54,29 +52,16 @@ SUBROUTINE RKSTEP(NEQ,FUNC,X,H,Y0,YN,AK,W)
     complex(kind(0d0)):: Y0(NEQ),YN(NEQ),AK(NEQ),W(NEQ)
     EXTERNAL FUNC
     CALL FUNC(X,Y0,AK)
-    do  I = 1,NEQ
-        YN(I) = Y0(I) + DCMPLX( H * C1 ) * AK(I)
-    enddo
-    do  I = 1,NEQ
-        W(I) = Y0(I) + DCMPLX( H * B2 ) * AK(I)
-    enddo
+
+    YN(1:neq) = Y0(1:neq) + DCMPLX( H * C1 ) * AK(1:neq)
+    W(1:neq) = Y0(1:neq) + DCMPLX( H * B2 ) * AK(1:neq)
     CALL FUNC(X + A2 * H,W,AK)
-    do  I = 1,NEQ
-        YN(I) = YN(I) + DCMPLX( H * C2 ) * AK(I)
-    enddo
-    do  I = 1,NEQ
-        W(I) = Y0(I) + DCMPLX( H * B3 ) * AK(I)
-    enddo
+    YN(1:neq) = YN(1:neq) + DCMPLX( H * C2 ) * AK(1:neq)
+    W(1:neq) = Y0(1:neq) + DCMPLX( H * B3 ) * AK(1:neq)
     CALL FUNC(X + A3 * H,W,AK)
-    do  I = 1,NEQ
-        YN(I) = YN(I) + DCMPLX( H * C3 ) * AK(I)
-    enddo
-    do I = 1,NEQ
-        W(I) = Y0(I) + DCMPLX( H ) * AK(I)
-    enddo
+    YN(1:neq) = YN(1:neq) + DCMPLX( H * C3 ) * AK(1:neq)
+    W(1:neq) = Y0(1:neq) + DCMPLX( H ) * AK(1:neq)
     CALL FUNC(X + H,W,AK)
-    do I = 1,NEQ
-        YN(I) = YN(I) + DCMPLX( H * C4 ) * AK(I)
-    enddo
+    YN(1:neq) = YN(1:neq) + DCMPLX( H * C4 ) * AK(1:neq)
     RETURN
     END

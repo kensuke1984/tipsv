@@ -6,8 +6,9 @@ subroutine calmatc( nlayer,vnp,vra,con,rpow,w1dn,w2dn,ra,m )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer,parameter:: maxrpow= 2
-    integer:: nlayer,vnp,rpow,w1dn,w2dn
-    double precision:: vra(vnp),con(vnp),ra(*),m(*)
+    integer,intent(in):: nlayer,vnp,rpow,w1dn,w2dn
+    double precision,intent(in):: vra(vnp),con(vnp),ra(*)
+    double precision,intent(out)::m(*)
     integer:: i,j,k,kk,l,nn,snp
     double precision:: a(2,2),b(2,2),c(5),rh
     ! parameter check
@@ -72,8 +73,10 @@ subroutine pmulti(n,a,m,b,l,c)
 ! (n-1) degrees polynomial a(n) and (m-1) degrees polynomial b(n).
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
-    integer:: n,m,l,i,j
-    double precision:: a(n),b(m),c(l)
+    integer,intent(in):: n,m,l
+    integer::i,j
+    double precision,intent(in):: a(n),b(m)
+    double precision,intent(out):: c(l)
 
     if (n+m-1/=l) stop 'Invalid arguments.(pmulti)'
     c=0
@@ -169,7 +172,8 @@ subroutine caltl( nlayer,vnp,vra,rho,ra,tl)
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: nlayer,vnp
-    double precision:: vra(vnp),rho(vnp),ra(*),tl(*)
+    double precision,intent(in):: vra(vnp),rho(vnp),ra(*)
+    double precision,intent(out):: tl(*)
     integer:: i,nn,snp
     double precision:: c(3),from,to
     !
@@ -222,22 +226,7 @@ subroutine calhl( nlayer,vnp,vra,mu,ra,hl)
     enddo
     return
 end
-!
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calt( nlayer, tl, tc, t )
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-    implicit none
-    integer:: nlayer
-    double precision:: t(*), tl(*), tc(*)
-    integer:: i
 
-    do i=1,4*nlayer
-        t(i) = ( tl(i) + tc(i) ) / 2.d0
-    enddo
-
-    return
-end
-!
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calh5( nlayer,vra,con,ra,h5 )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

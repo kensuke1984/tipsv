@@ -133,13 +133,14 @@ subroutine calnl( nzone,vs,iphase,nsl,nll )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! counting of nsl and nll.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     integer:: nzone,iphase(*),nsl,nll
     double precision:: vs(4,*)
     integer:: i
-    !
+
     nsl = 0
     nll = 0
-    do   i=1,nzone
+    do i=1,nzone
         if ( ( vs(1,i)==0.d0 ).and.( vs(2,i)==0.d0 ).and.&
             ( vs(3,i)==0.d0 ).and.( vs(4,i)==0.d0 ) ) then
             nll = nll + 1
@@ -149,7 +150,6 @@ subroutine calnl( nzone,vs,iphase,nsl,nll )
             iphase(i) = 1
         endif
     enddo
-    !
     return
 end
 
@@ -157,6 +157,7 @@ end
 subroutine calgrid( nzone,vrmin,vrmax,vp,vs,rmin,rmax,&
     imax,lmin,tlen,vmin,gridpar,dzpar )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     double precision, parameter:: pi=3.1415926535897932d0
     integer:: nzone,imax,lmin
     double precision:: vrmin(*),vrmax(*),vp(4,*),vs(4,*)
@@ -167,13 +168,9 @@ subroutine calgrid( nzone,vrmin,vrmax,vp,vs,rmin,rmax,&
     do izone=1,nzone
         ! computing the S-velocity at each zone
         if ( vs(1,izone)==0.d0 ) then
-            do i=1,4
-                v(i) = vp(i,izone)
-            enddo
+            v(1:4) = vp(1:4,izone)
         else
-            do i=1,4
-                v(i) = vs(i,izone)
-            enddo
+            v(1:4) = vs(1:4,izone)
         endif
         vs1 = 0.d0
         vs2 = 0.d0
@@ -230,10 +227,8 @@ subroutine calgrid( nzone,vrmin,vrmax,vp,vs,rmin,rmax,&
     do izone=1,nzone
         gtmp = gtmp + gridpar(izone)
     enddo
-    do izone=1,nzone
-        gridpar(izone) = gridpar(izone) / gtmp
-    enddo
-    !
+    gridpar(1:nzone) = gridpar(1:nzone) / gtmp
+
     return
 end
 !
@@ -314,6 +309,7 @@ subroutine calsp( maxnzone,ndc,nsl,nll,&
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Computing the stack points.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     integer:: maxnzone
     integer:: ndc,nsl,nll,iphase(*),nlayer(maxnzone)
     integer:: nslay,nllay
@@ -450,6 +446,7 @@ subroutine calstg( maxnlay,maxnzone, nzone,iphase,rrho,&
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Computing the structure grid points.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     integer:: maxnlay,maxnzone,nzone,iphase(*),nnl(*),vnp,spn
     double precision:: rrho(4,*),vpv(4,*),vph(4,*),vsv(4,*),vsh(4,*),eta(4,*)
     double precision:: ra(*),rmax
@@ -459,7 +456,6 @@ subroutine calstg( maxnlay,maxnzone, nzone,iphase,rrho,&
     double precision:: r0,ecA0,ecC0,ecF0,ecL0
     double precision:: trho,tvpv,tvph,tvsv,tvsh,teta,coef
     integer:: izone,i,j,itmp,jtmp
-    !
     ! initializing the data
     vra(1: maxnlay+2*maxnzone+1)=0
     rho(1: maxnlay+2*maxnzone+1)=0
@@ -611,6 +607,7 @@ subroutine submat( nlayer,ha,hb,h )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Subtracting matrix `hb' from matrix `ha'.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     integer:: nlayer
     double precision:: ha(*),hb(*),h(*)
 
@@ -726,6 +723,7 @@ end
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine calcutd(nzone,nnl,tmpc,rat,nn,iphase,spo,spn,ra,kkdr,kc)
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    implicit none
     integer:: nzone,nn,spn,kkdr(*),kc,iphase(*),nnl(*)
     complex(kind(0d0)) ::tmpc(*)
     double precision:: rat,spo,ra(*)

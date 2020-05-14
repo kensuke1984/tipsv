@@ -1,14 +1,17 @@
 # makefile .fr tipsv
 PROGS = mpi-tipsv
 FC	= mpif90
-FC2= ifort
+FC2= gfortran
 FFLAGS	= -O
-SRC = calmat.f90 trialf.f90 others.f90 rk3.f90 glu2.f90 dcsymbdl0.f90 dcsymbdl.f90 \
+SRC = calmat.f90 trialf.f90 others.f90 rk3.f90 glu2.f90 dcsymbdl.f90 \
 	mpi-tipsv.f90 formpi.f90
 OBJS	= $(SRC:.f90=.o)
 .SUFFIXES: .f90 .o
 
 all:$(PROGS) 
+
+tipsv: tipsv.f90
+	$(FC2) $(FFLAGS) tipsv.f90 -o tipsv $(OBJS)
 
 mpi-tipsv: $(OBJS)
 	$(FC) $(FFLAGS) -o $@ $(OBJS)
