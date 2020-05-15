@@ -52,7 +52,7 @@ SUBROUTINE DCSYMBDL(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
         PIV = DCMPLX(1.0D0) / A(NK+M)
         DO  J=2,M+1
             Z(J) = - A(NK+M*J)
-            W(J) =	 A(NK+M*J) * PIV
+            W(J) = A(NK+M*J) * PIV
             A(NK+M*J) = W(J)
         enddo
         !
@@ -75,7 +75,7 @@ SUBROUTINE DCSYMBDL(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
         PIV = DCMPLX(1.0D0) / A(NK+M)
         DO  J=2,N-K+1
             Z(J) = - A(NK+M*J)
-            W(J) =	 A(NK+M*J) * PIV
+            W(J) = A(NK+M*J) * PIV
             A(NK+M*J) = W(J)
             !
             NKI = NKK + M * (J-1)
@@ -89,7 +89,7 @@ SUBROUTINE DCSYMBDL(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
 !  END OF SYMBDL
 END SUBROUTINE DCSYMBDL
 !
-SUBROUTINE DCSBDLV(A,B,M,N,NP,EPS,Z,IER)
+SUBROUTINE DCSBDLV(A,B,M,N,NP,Z)
 !**********************************************************************
 !  GAUSS METHOD FOR A SYMMETRIC BAND MATRIX WITH A SHORT WIDTH.       *
 !  THIS ROUTINE IS FOR A VECTOR COMPUTER.                             *
@@ -111,8 +111,7 @@ SUBROUTINE DCSBDLV(A,B,M,N,NP,EPS,Z,IER)
 ! modified: Kensuke Konishi 2018 in Paris
 !**********************************************************************
     implicit none
-    INTEGER:: M,N,NP,IER
-    double precision::EPS
+    INTEGER:: M,N,NP
     COMPLEX(kind(0d0)):: A(M+1,N),B(N),Z(N)
     INTEGER:: MM,J,K,I1
     COMPLEX(kind(0d0)):: SUM
@@ -205,7 +204,7 @@ SUBROUTINE DCSYMBDL0(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
         PIV = DCMPLX(1.0D0) / A(NK+M)
         DO J=2,M+1
             Z(J) = - A(NK+M*J)
-            W(J) =	 A(NK+M*J) * PIV
+            W(J) = A(NK+M*J) * PIV
             A(NK+M*J) = W(J)
         enddo
         !
@@ -228,7 +227,7 @@ SUBROUTINE DCSYMBDL0(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
         PIV = DCMPLX(1.0D0) / A(NK+M)
         DO  J=2,N-K+1
             Z(J) = - A(NK+M*J)
-            W(J) =	 A(NK+M*J) * PIV
+            W(J) = A(NK+M*J) * PIV
             A(NK+M*J) = W(J)
             !
             NKI = NKK + M * (J-1)
@@ -243,7 +242,7 @@ SUBROUTINE DCSYMBDL0(A,M,N,NN,EPS,Z,W,L,LI,LJ,IER)
 END
 !
 !      SUBROUTINE DCSBDLV0(A,B,M,N,NP,EPS,Z,IER)
-SUBROUTINE DCSBDLV0(A,B,M,N,EPS,Z,IER)
+SUBROUTINE DCSBDLV0(A,B,M,N,Z)
 !**********************************************************************
 !  GAUSS METHOD FOR A SYMMETRIC BAND MATRIX WITH A SHORT WIDTH.       *
 !  THIS ROUTINE IS FOR A VECTOR COMPUTER.                             *
@@ -264,8 +263,7 @@ SUBROUTINE DCSBDLV0(A,B,M,N,EPS,Z,IER)
 !  COPYRIGHT:       FUMIKO NAGAHORI    1 SEP. 1991      VER. 1        *
 !**********************************************************************
     IMPLICIT NONE
-    integer:: M,N,NP,IER
-    double precision:: EPS
+    integer:: M,N
     complex(kind(0d0)):: A(M+1,N),B(N),Z(N)
     integer:: MM,J,K,I1,J1
     complex(kind(0d0)):: SUM

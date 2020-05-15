@@ -27,7 +27,7 @@ SUBROUTINE RK3(NEQ,FUNC,X0,XE,N,Y0,YN,N1,WORK)
 !*********************************************************************
     implicit none
     EXTERNAL FUNC
-    INTEGER:: NEQ,N,I,J,N1
+    INTEGER:: NEQ,N,I,N1
     double precision:: X0,XE
     complex(kind(0d0)):: Y0(NEQ),YN(NEQ),WORK(N1,2)
     double precision:: H
@@ -47,7 +47,7 @@ SUBROUTINE RKSTEP(NEQ,FUNC,X,H,Y0,YN,AK,W)
     PARAMETER(A2 = 0.5D0, A3 = A2)
     PARAMETER(B2 = 0.5D0, B3 = B2)
     PARAMETER(C1 = 1.D0/6.D0, C2 = 1.D0/3.D0, C3 = C2, C4 = C1)
-    INTEGER:: NEQ,I
+    INTEGER:: NEQ
     double precision:: X,H
     complex(kind(0d0)):: Y0(NEQ),YN(NEQ),AK(NEQ),W(NEQ)
     EXTERNAL FUNC

@@ -428,9 +428,9 @@ subroutine calcoef( nzone,omega,qmu,qkappa,coef1,coef2,coef )
     end
 !
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine cala0( nlayer,omega,omegai,t,h1x,h1y,h1z,h2L,h2N,&
-    h3ax,h3ay,h3az,h4aL,h4aN,h5ax,h5ay,h5az,h6aL,h6aN,&
-    h7x,h7y,h7z,h8L,h8N,coef1,coef2,a0 )
+subroutine cala0( nlayer,omega,omegai,t,h1x,h2L,h2N,&
+    h3ay,h4aL,h4aN,h5ay,h6aL,h6aN,&
+    h7y,h7z,h8L,h8N,coef1,coef2,a0 )
     implicit none
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Computing the coefficient matrix 'a' in the solid part.
@@ -438,10 +438,10 @@ subroutine cala0( nlayer,omega,omegai,t,h1x,h1y,h1z,h2L,h2N,&
     integer:: nlayer
     double precision:: omega,omegai
     double precision:: t(*)
-    double precision:: h1x(*),h1y(*),h1z(*),h2L(*),h2N(*)
-    double precision:: h3ax(*),h3ay(*),h3az(*),h4aL(*),h4aN(*)
-    double precision:: h5ax(*),h5ay(*),h5az(*),h6aL(*),h6aN(*)
-    double precision:: h7x(*),h7y(*),h7z(*),h8L(*),h8N(*)
+    double precision,intent(in):: h1x(*),h2L(*),h2N(*)
+    double precision,intent(in):: h3ay(*),h4aL(*),h4aN(*)
+    double precision,intent(in):: h5ay(*),h6aL(*),h6aN(*)
+    double precision,intent(in):: h7y(*),h7z(*),h8L(*),h8N(*)
     complex(kind(0d0))::coef1,coef2,a0(*)
     integer:: i,nnn
     double precision:: tt
@@ -476,16 +476,16 @@ subroutine cala0( nlayer,omega,omegai,t,h1x,h1y,h1z,h2L,h2N,&
 end
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine cala1( nlayer,h1x,h1y,h1z,h2L,h2N,h3x,h3y,h3z,&
-    h4L,h4N,h5x,h5y,h5z,h6L,h6N,coef1,coef2,a1 )
+subroutine cala1( nlayer,h1x,h2L,h2N,h3y,&
+    h4L,h4N,h5y,h6L,h6N,coef1,coef2,a1 )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Computing the coefficient matrix 'a' in the solid part.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: nlayer
-    double precision:: h1x(*),h1y(*),h1z(*),h2L(*),h2N(*)
-    double precision:: h3x(*),h3y(*),h3z(*),h4L(*),h4N(*)
-    double precision:: h5x(*),h5y(*),h5z(*),h6L(*),h6N(*)
+    double precision:: h1x(*),h2L(*),h2N(*)
+    double precision:: h3y(*),h4L(*),h4N(*)
+    double precision:: h5y(*),h6L(*),h6N(*)
     complex(kind(0d0)):: coef1,coef2,a1(*)
     integer:: i,nnn
     complex(kind(0d0)):: hh1
@@ -519,13 +519,13 @@ subroutine cala1( nlayer,h1x,h1y,h1z,h2L,h2N,h3x,h3y,h3z,&
     end
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine cala2( nlayer,h1x,h1y,h1z,h2L,h2N,coef1,coef2,a2 )
+subroutine cala2( nlayer,h1x,h2L,h2N,coef1,coef2,a2 )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Computing the coefficient matrix 'a' in the solid part.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: nlayer
-    double precision:: h1x(*),h1y(*),h1z(*),h2L(*),h2N(*)
+    double precision:: h1x(*),h2L(*),h2N(*)
     complex(kind(0d0)):: coef1,coef2,a2(*)
     integer:: i,nnn
     complex(kind(0d0)):: hh2
@@ -574,14 +574,14 @@ subroutine calb0( nlayer,omega,omegai,p1,p3,coef,b0 )
     end
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calb2( nlayer,omega,omegai,p2,coef,b2 )
+subroutine calb2( nlayer,omega,omegai,p2,b2 )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Computing the coefficient matrix 'b' in the solid part.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: nlayer
-    double precision:: omega,omegai,p2(*)
-    complex(kind(0d0)):: coef,b2(*)
+    double precision,intent(in):: omega,omegai,p2(*)
+    complex(kind(0d0)):: b2(*)
     integer:: i
     complex(kind(0d0)):: comega2
 
@@ -601,17 +601,15 @@ subroutine calb2( nlayer,omega,omegai,p2,coef,b2 )
 end
 !
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calhml( nlayer,coef1,coef2, h3mx,h3my,h3mz,h5mx,h5my,h5mz,&
-    h4m1L,h4m1N,h4m2L,h4m2N,h6m1L,h6m1N,h6m2L,h6m2N,a1 )
+subroutine calhml( nlayer,coef1,coef2,h3my,h5my,&
+    h4m1L,h4m2N,h6m1N,h6m2L,a1 )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Summing up the modified first derivatives matrix operators.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
     integer:: nlayer
-    double precision:: h3mx(-2:1,*),h3my(-2:1,*),h3mz(-2:1,*)
-    double precision:: h5mx(-1:2,*),h5my(-1:2,*),h5mz(-1:2,*)
-    double precision:: h4m1L(-1:2,*),h4m1N(-1:2,*),h4m2L(-2:1,*),h4m2N(-2:1,*)
-    double precision:: h6m1L(-1:2,*),h6m1N(-1:2,*),h6m2L(-2:1,*),h6m2N(-2:1,*)
+    double precision,intent(in):: h3my(-2:1,*),h4m1L(-1:2,*),h4m2N(-2:1,*)
+    double precision,intent(in):: h5my(-1:2,*),h6m1N(-1:2,*),h6m2L(-2:1,*)
     complex(kind(0d0)):: coef1,coef2,a1(4,*)
     integer:: i,j,m,n
     !
@@ -769,13 +767,13 @@ subroutine cala( maxnzone,ndc,iphase,nlayer,kkdr,kdr,ksp,&
     end
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine calbc( maxnzone,ndc,rdc,iphase,kkdr,a )
+subroutine calbc( ndc,rdc,iphase,kkdr,a )
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! Computing the boundary condition elements.
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     implicit none
-    integer:: maxnzone,ndc,iphase(*),kkdr(*)
-    double precision:: rdc(*)
+    integer,intent(in):: ndc,iphase(*),kkdr(*)
+    double precision,intent(in):: rdc(ndc)
     complex(kind(0d0)):: a(4,*)
     integer:: i
 
