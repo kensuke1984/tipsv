@@ -1,5 +1,5 @@
-program tipsv
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+program mpitipsv
+!----------------------------------------------------------
 !  ************** mpi-tipsv.f ****************
 ! Computation of PSV synthetic seismograms
 ! in transversely isotropic for anisotropic PREM
@@ -7,161 +7,152 @@ program tipsv
 ! Synthetics for shallow events can be computed.
 !                                                 2002.12  K.Kawai
 !       2009. ?      Kensuke Konishi
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-implicit none
-! ---------------------------<< constants >>---------------------------
-double precision pi,lmaxdivf,shallowdepth
-integer maxnlay,maxnslay,maxnllay
-integer maxnzone,maxnr,maxlmax
-parameter ( pi=3.1415926535897932d0 )
-parameter ( maxnlay = 80880 )
-parameter ( maxnslay = 48840 )
-parameter ( maxnllay = 32040 )
-parameter ( maxnzone = 20 )
-parameter ( maxnr = 500 )
-parameter ( maxlmax = 80000 )
-parameter ( lmaxdivf = 2.d4 )
-parameter ( shallowdepth = 100.d0 )
+!----------------------------------------------------------
+    use parameters
+    implicit none
 ! ---------------------------<< variables >>---------------------------
 ! variable for the trial function
-integer nnlayer,nlayer(maxnzone)
-integer nslay,nllay
-integer inlayer,jnlayer,jnslay,jnllay
-integer l,m
-double precision ra(maxnlay+maxnzone+1),plm(3,0:3,maxnr)
-complex(kind(0d0)) bvec(3,-2:2,maxnr)
+    integer nnlayer,nlayer(maxnzone)
+    integer nslay,nllay
+    integer inlayer,jnlayer,jnslay,jnllay
+    integer l,m
+    double precision ra(maxnlay+maxnzone+1),plm(3,0:3,maxnr)
+    complex(dp) bvec(3,-2:2,maxnr)
 ! variable for the structure
-integer nzone,isl,ill,nsl,nll
-integer iphase(maxnzone),ndc,vnp
-double precision rmin,rmax
-double precision vrmin(maxnzone),vrmax(maxnzone)
-double precision rrho(4,maxnzone)
-double precision vpv(4,maxnzone),vph(4,maxnzone)
-double precision vsv(4,maxnzone),vsh(4,maxnzone),eta(4,maxnzone)
-double precision qmu(maxnzone),qkappa(maxnzone)
-double precision vra(maxnlay+2*maxnzone+1)
-double precision rho(maxnlay+2*maxnzone+1)
-double precision kappa(maxnlay+2*maxnzone+1)
-double precision ecKx(maxnlay+2*maxnzone+1) !3*Kx=3A-4N
-double precision ecKy(maxnlay+2*maxnzone+1) !3*Ky=3F+2N
-double precision ecKz(maxnlay+2*maxnzone+1) !3*Kz=2F+C
-double precision mu(maxnlay+2*maxnzone+1)
-double precision ecL(maxnlay+2*maxnzone+1)
-double precision ecN(maxnlay+2*maxnzone+1)
-double precision rhoinv(maxnlay+2*maxnzone+1)
-double precision kappainv(maxnlay+2*maxnzone+1)
-complex(kind(0d0)) coef1(maxnzone),coef2(maxnzone),coef(maxnzone)
+    integer nzone,isl,ill,nsl,nll
+    integer iphase(maxnzone),ndc,vnp
+    double precision rmin,rmax
+    double precision vrmin(maxnzone),vrmax(maxnzone)
+    double precision rrho(4,maxnzone)
+    double precision vpv(4,maxnzone),vph(4,maxnzone)
+    double precision vsv(4,maxnzone),vsh(4,maxnzone),eta(4,maxnzone)
+    double precision qmu(maxnzone),qkappa(maxnzone)
+    double precision vra(maxnlay+2*maxnzone+1)
+    double precision rho(maxnlay+2*maxnzone+1)
+    double precision kappa(maxnlay+2*maxnzone+1)
+    double precision ecKx(maxnlay+2*maxnzone+1) !3*Kx=3A-4N
+    double precision ecKy(maxnlay+2*maxnzone+1) !3*Ky=3F+2N
+    double precision ecKz(maxnlay+2*maxnzone+1) !3*Kz=2F+C
+    double precision mu(maxnlay+2*maxnzone+1)
+    double precision ecL(maxnlay+2*maxnzone+1)
+    double precision ecN(maxnlay+2*maxnzone+1)
+    double precision rhoinv(maxnlay+2*maxnzone+1)
+    double precision kappainv(maxnlay+2*maxnzone+1)
+    complex(dp) coef1(maxnzone),coef2(maxnzone),coef(maxnzone)
 ! variable for the periodic range
-integer np,imin,imax
-double precision tlen,omega,omegai
-complex(kind(0d0)) u(3,maxnr)
+    integer np,imin,imax
+    double precision tlen,omega,omegai
+    complex(dp) u(3,maxnr)
 ! variable for the source
-integer spn,ns
-double precision r0,mt(3,3),spo,eqlat,eqlon
-double precision ecC0,ecF0,ecL0
-complex(kind(0d0)) ya(4),yb(4),yc(4),yd(4)
+    integer spn,ns
+    double precision r0,mt(3,3),spo,eqlat,eqlon
+    double precision ecC0,ecF0,ecL0
+    complex(dp) ya(4),yb(4),yc(4),yd(4)
 ! variable for the station
-integer nr,ir
-double precision theta(maxnr),phi(maxnr)
-double precision lat(maxnr),lon(maxnr)
+    integer nr,ir
+    double precision theta(maxnr),phi(maxnr)
+    double precision lat(maxnr),lon(maxnr)
 ! variable for the matrix elements
-complex(kind(0d0)) a0(4,2*(2*(maxnslay+1)+(maxnllay+1)+maxnzone))
-complex(kind(0d0)) a1(4,2*(2*(maxnslay+1)+(maxnllay+1)+maxnzone))
-complex(kind(0d0)) a2(4,2*(2*(maxnslay+1)+(maxnllay+1)+maxnzone))
-complex(kind(0d0)) a( 4, 2*(maxnslay+1) + (maxnllay+1) )
-complex(kind(0d0)) c( 2, (maxnslay+1) + (maxnllay+1) )
-double precision  t( 8*maxnslay )
-double precision h1x( 8*maxnslay ),h1y( 8*maxnslay ),h1z( 8*maxnslay )
-double precision h2L( 8*maxnslay ),h2N( 8*maxnslay )
-double precision h3ax( 8*maxnslay )
-double precision h3ay( 8*maxnslay ),h3az( 8*maxnslay )
-double precision h4aL( 8*maxnslay ),h4aN( 8*maxnslay )
-double precision h5ax( 8*maxnslay ),h5ay( 8*maxnslay ),h5az( 8*maxnslay )
-double precision h6aL( 8*maxnslay ),h6aN( 8*maxnslay )
-double precision h3x( 8*maxnslay ),h3y( 8*maxnslay ),h3z( 8*maxnslay )
-double precision h4L( 8*maxnslay ),h4N( 8*maxnslay )
-double precision h5x( 8*maxnslay ),h5y( 8*maxnslay ),h5z( 8*maxnslay )
-double precision h6L( 8*maxnslay ),h6N( 8*maxnslay )
-double precision h7x( 8*maxnslay ),h7y( 8*maxnslay ),h7z( 8*maxnslay )
-double precision h8L( 8*maxnslay ),h8N( 8*maxnslay )
-double precision h3mx(-2:1,2*(maxnslay+maxnzone) )
-double precision h3my(-2:1,2*(maxnslay+maxnzone) )
-double precision h3mz(-2:1,2*(maxnslay+maxnzone) )
-double precision h5mx(-1:2,2*(maxnslay+maxnzone) )
-double precision h5my(-1:2,2*(maxnslay+maxnzone) )
-double precision h5mz(-1:2,2*(maxnslay+maxnzone) )
-double precision h4m1L(-1:2,2*(maxnslay+maxnzone) )
-double precision h4m1N(-1:2,2*(maxnslay+maxnzone) )
-double precision h4m2L(-2:1,2*(maxnslay+maxnzone) )
-double precision h4m2N(-2:1,2*(maxnslay+maxnzone) )
-double precision h6m1L(-1:2,2*(maxnslay+maxnzone) )
-double precision h6m1N(-1:2,2*(maxnslay+maxnzone) )
-double precision h6m2L(-2:1,2*(maxnslay+maxnzone) )
-double precision h6m2N(-2:1,2*(maxnslay+maxnzone) )
-double precision p1(8*maxnllay ),p2( 8*maxnllay ),p3( 8*maxnllay )
-complex(kind(0d0)) g(2*(maxnslay+1) + (maxnllay+1) )
-complex(kind(0d0)) d((maxnslay+1) + (maxnllay+1) )
+    complex(dp) a0(4,2*(2*(maxnslay+1)+(maxnllay+1)+maxnzone))
+    complex(dp) a1(4,2*(2*(maxnslay+1)+(maxnllay+1)+maxnzone))
+    complex(dp) a2(4,2*(2*(maxnslay+1)+(maxnllay+1)+maxnzone))
+    complex(dp) a( 4, 2*(maxnslay+1) + (maxnllay+1) )
+    complex(dp) c( 2, (maxnslay+1) + (maxnllay+1) )
+    double precision  t( 8*maxnslay )
+    double precision h1x( 8*maxnslay ),h1y( 8*maxnslay ),h1z( 8*maxnslay )
+    double precision h2L( 8*maxnslay ),h2N( 8*maxnslay )
+    double precision h3ax( 8*maxnslay )
+    double precision h3ay( 8*maxnslay ),h3az( 8*maxnslay )
+    double precision h4aL( 8*maxnslay ),h4aN( 8*maxnslay )
+    double precision h5ax( 8*maxnslay ),h5ay( 8*maxnslay ),h5az( 8*maxnslay )
+    double precision h6aL( 8*maxnslay ),h6aN( 8*maxnslay )
+    double precision h3x( 8*maxnslay ),h3y( 8*maxnslay ),h3z( 8*maxnslay )
+    double precision h4L( 8*maxnslay ),h4N( 8*maxnslay )
+    double precision h5x( 8*maxnslay ),h5y( 8*maxnslay ),h5z( 8*maxnslay )
+    double precision h6L( 8*maxnslay ),h6N( 8*maxnslay )
+    double precision h7x( 8*maxnslay ),h7y( 8*maxnslay ),h7z( 8*maxnslay )
+    double precision h8L( 8*maxnslay ),h8N( 8*maxnslay )
+    double precision h3mx(-2:1,2*(maxnslay+maxnzone) )
+    double precision h3my(-2:1,2*(maxnslay+maxnzone) )
+    double precision h3mz(-2:1,2*(maxnslay+maxnzone) )
+    double precision h5mx(-1:2,2*(maxnslay+maxnzone) )
+    double precision h5my(-1:2,2*(maxnslay+maxnzone) )
+    double precision h5mz(-1:2,2*(maxnslay+maxnzone) )
+    double precision h4m1L(-1:2,2*(maxnslay+maxnzone) )
+    double precision h4m1N(-1:2,2*(maxnslay+maxnzone) )
+    double precision h4m2L(-2:1,2*(maxnslay+maxnzone) )
+    double precision h4m2N(-2:1,2*(maxnslay+maxnzone) )
+    double precision h6m1L(-1:2,2*(maxnslay+maxnzone) )
+    double precision h6m1N(-1:2,2*(maxnslay+maxnzone) )
+    double precision h6m2L(-2:1,2*(maxnslay+maxnzone) )
+    double precision h6m2N(-2:1,2*(maxnslay+maxnzone) )
+    double precision p1(8*maxnllay ),p2( 8*maxnllay ),p3( 8*maxnllay )
+    complex(dp) g(2*(maxnslay+1) + (maxnllay+1) )
+    complex(dp) d((maxnslay+1) + (maxnllay+1) )
 ! variable for the file
-character*80 output(maxnr)
+    character*80 output(maxnr)
 ! variable for the stack point
-integer isp(maxnzone)
-integer issp(maxnzone)
-integer ilsp(maxnzone),jssp(maxnzone)
-integer jsp(maxnzone)
-integer ksp(maxnzone),lsp(maxnzone)
-integer isdr,jsdr,ildr
+    integer isp(maxnzone)
+    integer issp(maxnzone)
+    integer ilsp(maxnzone),jssp(maxnzone)
+    integer jsp(maxnzone)
+    integer ksp(maxnzone),lsp(maxnzone)
+    integer isdr,jsdr,ildr
 ! variables for the gridding
-integer jjdr(maxnzone),kkdr(maxnzone)
-integer jdr,kdr
-double precision vmin(maxnzone),gridpar(maxnzone),dzpar(maxnzone)
+    integer jjdr(maxnzone),kkdr(maxnzone)
+    integer jdr,kdr
+    double precision vmin(maxnzone),gridpar(maxnzone),dzpar(maxnzone)
 ! variables for l cut off
-complex(kind(0d0)) tmpc(2*(maxnslay+1) + (maxnllay+1))
-integer sufzone,ismall,kc,lsuf,llog
-double precision maxamp,ratc,ratl,re
+    complex(dp) tmpc(2*(maxnslay+1) + (maxnllay+1))
+    integer ismall,kc,lsuf,llog
+    double precision maxamp,ratc,ratl,re
 ! variables for the numerical integration
-complex(kind(0d0)) anum(4,4,10),bnum(4,4,10)
+    complex(dp) anum(4,4,10),bnum(4,4,10)
 ! other variables
-integer i,j,ii,nn,lda,ier,itmp,jtmp,mtmp,kkdr0,nn0
-integer ll(12),lli(12),llj(12)
-double precision eps,work(8*maxnslay),l2,lsq
-complex(kind(0d0)) z( 2*(maxnslay+1) + (maxnllay+1) )
-complex(kind(0d0)) w( 2*(maxnslay+1) + (maxnllay+1) )
-complex(kind(0d0)) cwork( 2*(16*maxnslay + 4*maxnllay) )
-integer ltmp(2),iimax
+    integer i,j,ii,nn,lda,ier,itmp,jtmp,mtmp,kkdr0,nn0
+    integer ll(12),lli(12),llj(12)
+    double precision eps,work(8*maxnslay),l2,lsq
+    complex(dp) z( 2*(maxnslay+1) + (maxnllay+1) )
+    complex(dp) w( 2*(maxnslay+1) + (maxnllay+1) )
+    complex(dp) cwork( 2*(16*maxnslay + 4*maxnllay) )
+    integer ltmp(2),iimax
 
-data lda/ 4 /
-data eps/ -1.d0 /
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    character(len=160) :: parameter_file
+
+    data lda/ 4 /
+    data eps/ -1.d0 /
+
+!ccccccccccccccccccccccccc
 !     MPI
 !ccccccccccccccccccccccccc
-include 'mpif.h'
-integer :: petot, my_rank, ista, ierr
-complex(kind(0d0)), allocatable, dimension(:,:,:) :: outputu
+    include 'mpif.h'
+    integer :: petot, my_rank, ista, ierr
+    complex(dp), allocatable, dimension(:,:,:) :: outputu
 !     when the values to be output use memory over outputmemory MB,&
 !     they are written in output files. The interval is outputinterval
 !     memoryperomega is the quantity of memory used for one omega step
-integer, allocatable, dimension (:) :: mpimin, mpimax
-call mpi_init (ierr)
-call MPI_COMM_SIZE (MPI_COMM_WORLD, PETOT, ierr)
-call MPI_COMM_RANK (MPI_COMM_WORLD, my_rank, ierr)
-!     write(*,*) "myrank",my_rank
-!cccccccccccccccccccccccccccccccccccccccccccccccccccccc
-allocate(mpimin(PETOT), mpimax(PETOT))
-!ccccccccccccccccccccccccccccccccccccccccccccccc
+    integer, allocatable, dimension (:) :: mpimin, mpimax
+    call mpi_init (ierr)
+    call MPI_COMM_SIZE (MPI_COMM_WORLD, PETOT, ierr)
+    call MPI_COMM_RANK (MPI_COMM_WORLD, my_rank, ierr)
 
+    allocate(mpimin(PETOT), mpimax(PETOT))
 
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! *************** Inputting and computing the parameters ***************
 ! --- inputting parameter ---
-if (my_rank ==0) then
-    call pinput2(maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax,&
-        nzone,vrmin,vrmax,rrho,vpv,vph,vsv,vsh,eta,qmu,qkappa,&
-        r0,eqlat,eqlon,mt,nr,theta,phi,lat,lon,output)
-endif
+    call get_command_argument(1, parameter_file)
+    if (my_rank ==0) then
+    !    call pinput2(maxnzone,maxnr,re,ratc,ratl,tlen,np,omegai,imin,imax,&
+     !       nzone,vrmin,vrmax,rrho,vpv,vph,vsv,vsh,eta,qmu,qkappa,&
+      !      r0,eqlat,eqlon,mt,nr,theta,phi,lat,lon,output)
+     call pinput_tipsv(parameter_file,re,ratc,ratl,tlen,np,omegai,imin,imax,&
+            nzone,vrmin,vrmax,rrho,vpv,vph,vsv,vsh,eta,qmu,qkappa,&
+            r0,eqlat,eqlon,mt,nr,theta,phi,lat,lon,output)
+    endif
 
 
-call MPI_BARRIER(MPI_COMM_WORLD, ierr)
+    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 !      write(*,*) my_rank
 !      call mpi_finalize(ierr)
 !      stop
@@ -210,9 +201,6 @@ rmin = vrmin(1)
 rmax = vrmax(nzone)
 ndc = nzone - 1
 
-    theta= theta / 180 * pi
-    phi= phi   / 180 * pi
-
 if ( (r0<rmin) .or. (r0>rmax) ) stop 'Location of the source is improper.'
 
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -224,8 +212,7 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
     iimax = int(tlen * 2.d0)
     call calgrid( nzone,vrmin,vrmax,vpv,vsv,rmin,rmax,&
                iimax,1,tlen,vmin,gridpar,dzpar )
-    call calra( maxnlay,maxnslay,maxnllay,maxnzone,&
-         inlayer,jnlayer,jnslay,jnllay,&
+    call calra(inlayer,jnlayer,jnslay,jnllay,&
        dzpar,nzone,vrmin,vrmax,iphase,&
        rmin,nslay,nllay,nlayer,ra,re )
     ! --- checking the parameter
@@ -235,10 +222,10 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
     if ( jnlayer>2*maxnlay ) stop 'The number of the total grid points is too large.'
     if ( ( jnslay>2*maxnslay ).or.( jnllay>2*maxnllay ) ) stop 'The number of the total grid points is too large.'
     ! computing the stack points
-    call calsp( maxnzone,ndc,nsl,nll,iphase,nlayer,nllay,&
+    call calsp(ndc,nsl,nll,iphase,nlayer,nllay,&
         isp,jsp,ksp,issp,ilsp,lsp,jssp,isdr,jsdr,ildr,jdr,kdr )
     ! computing the source location
-    call calspo( maxnlay,maxnzone,vrmax,iphase,inlayer,r0,rmin,rmax,ra,isp,spo,spn )
+    call calspo( vrmax,iphase,inlayer,r0,rmin,rmax,ra,isp,spo,spn )
     ! ******************* Computing the matrix elements *******************
     ! data initialization
     a=0
@@ -292,7 +279,7 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
     p3=0
 
     ! computing the structure grid points
-    call calstg( maxnlay,maxnzone,nzone,rrho,vpv,vph,vsv,vsh,eta,nlayer,ra,rmax,&
+    call calstg( nzone,rrho,vpv,vph,vsv,vsh,eta,nlayer,ra,rmax,&
         vnp,vra,rho,kappa,ecKx,ecKy,ecKz,mu,ecL,ecN,r0,spn,ecC0,ecF0,ecL0 )
     rhoinv(1:vnp)   = 1.d0 / rho(1:vnp)
     kappainv(1:vnp) = 1.d0 / kappa(1:vnp)
@@ -348,7 +335,7 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
         endif
     enddo
     ! Computing the modified operator of the 1st derivative
-    call caltstg( maxnlay,maxnzone,nzone,rrho,vpv,vph,vsv,vsh,eta,&
+    call caltstg(nzone,rrho,vpv,vph,vsv,vsh,eta,&
         nlayer,ra,rmax,vra,kappa,ecKx,ecKy,ecKz,mu,ecL,ecN )
     isl = 0
     do i=1,ndc+1
@@ -356,16 +343,16 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
             isl = isl + 1
             itmp = isdr+issp(isl)
             jtmp = isp(i)+i-1
-            call calh5( nlayer(i),vra(jtmp),ecKx(jtmp),ra(isp(i)),work(itmp) )
-            call submat( nlayer(i),h5ax(itmp),work(itmp),h5x(itmp) )
+             call calh5( nlayer(i),vra(jtmp),ecKx(jtmp),ra(isp(i)),work(itmp) )
+            h5x(itmp:itmp+4*nlayer(i)-1)= h5ax(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
             call calh5( nlayer(i),vra(jtmp),ecKy(jtmp),ra(isp(i)),work(itmp) )
-            call submat( nlayer(i),h5ay(itmp),work(itmp),h5y(itmp) )
+            h5y(itmp:itmp+4*nlayer(i)-1)= h5ay(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
             call calh5( nlayer(i),vra(jtmp),ecKz(jtmp),ra(isp(i)),work(itmp) )
-            call submat( nlayer(i),h5az(itmp),work(itmp),h5z(itmp) )
+            h5z(itmp:itmp+4*nlayer(i)-1)= h5az(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
             call calh5( nlayer(i),vra(jtmp),ecL(jtmp),ra(isp(i)),work(itmp) )
-            call submat( nlayer(i),h6aL(itmp),work(itmp),h6L(itmp) )
+            h6L(itmp:itmp+4*nlayer(i)-1)= h6aL(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
             call calh5( nlayer(i),vra(jtmp),ecN(jtmp),ra(isp(i)),work(itmp) )
-            call submat( nlayer(i),h6aN(itmp),work(itmp),h6N(itmp) )
+            h6N(itmp:itmp+4*nlayer(i)-1)= h6aN(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
             call mtrnp( nlayer(i),h5x(itmp),h3x(itmp) )
             call mtrnp( nlayer(i),h5y(itmp),h3y(itmp) )
             call mtrnp( nlayer(i),h5z(itmp),h3z(itmp) )
@@ -473,12 +460,11 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
                 ! computing the coefficient matrix elements
                 ! --- renewing  mdr
                 if (  mod(l,50)==0  ) then
-                    call calmdr( omega,l,nzone,vrmax,vmin,rmax,sufzone )
-                    call calspdr( maxnzone,nzone,iphase,nlayer,jjdr,kkdr )
+                    call calspdr( nzone,iphase,nlayer,jjdr,kkdr )
                     nn = kkdr(nzone) + 2 * nlayer(nzone) + 1
                 endif
                 ! computing the matrix elements
-                call cala( maxnzone,ndc,iphase,nlayer,kkdr,kdr,ksp,l2,lsq,nn,a0,a1,a2,a )
+                call cala( ndc,iphase,nlayer,kkdr,kdr,ksp,l2,lsq,nn,a0,a1,a2,a )
                 ! computing the boundary condition elements
                 call calbc(ndc,vrmax,iphase,kkdr,a )
 
@@ -512,7 +498,7 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
                             ns = kkdr(spn) + 2 * ( nint(spo) - 1 )
                             if( mod(l,100)==0) then
                                 if ( ( m==-2 ).or.( m==-l ) )&
-                                 call dcsymbdl0( a(1,itmp),3,nn-itmp+1,6,eps,z(itmp),w(itmp),ll,lli,llj,ier )
+                                 call dcsymbdl( a(1,itmp),3,nn-itmp+1,6,eps,z(itmp),w(itmp),ll,lli,llj,ier )
 
                                 call dcsbdlv0( a(1,itmp),g(itmp),3,nn-itmp+1,z(itmp))
                                 ! sum up c of the same l
@@ -543,7 +529,7 @@ if( (rmax-r0)<shallowdepth) then ! option for shallow events
 endif                     ! option for shallow events
 call calgrid( nzone,vrmin,vrmax,vpv,vsv,rmin,rmax,&
          iimax,1,tlen,vmin,gridpar,dzpar )
-call calra( maxnlay,maxnslay,maxnllay,maxnzone,inlayer,jnlayer,jnslay,jnllay,&
+call calra(inlayer,jnlayer,jnslay,jnllay,&
          dzpar,nzone,vrmin,vrmax,iphase,rmin,nslay,nllay,nlayer,ra,re )
 ! --- checking the parameter
 if ( inlayer>maxnlay ) stop 'The number of grid points is too large.'
@@ -552,17 +538,13 @@ if ( nllay>maxnllay ) stop 'The number of the grid points in the liquid is too l
 if ( jnlayer>2*maxnlay ) stop 'The number of the total grid points is too large.'
 if ( ( jnslay>2*maxnslay ).or.( jnllay>2*maxnllay ) ) stop 'The number of the total grid points is too large.'
 ! computing the stack points
-call calsp( maxnzone,ndc,nsl,nll,iphase,nlayer,nllay,&
+call calsp(ndc,nsl,nll,iphase,nlayer,nllay,&
     isp,jsp,ksp,issp,ilsp,lsp,jssp,isdr,jsdr,ildr,jdr,kdr )
 ! computing the source location
-call calspo( maxnlay,maxnzone,vrmax,iphase,inlayer,r0,rmin,rmax,ra,isp,spo,spn )
+call calspo( vrmax,iphase,inlayer,r0,rmin,rmax,ra,isp,spo,spn )
 ! ******************* Computing the matrix elements *******************
 ! data initialization
-    a=0
-    t=0
-    h1x=0
-    h1y=0
-    h1z=0
+
     h2L=0
     h2N=0
     h3ax=0
@@ -609,8 +591,7 @@ call calspo( maxnlay,maxnzone,vrmax,iphase,inlayer,r0,rmin,rmax,ra,isp,spo,spn )
     p3=0
 
 ! computing the structure grid points
-call calstg( maxnlay,maxnzone,nzone,rrho,&
-         vpv,vph,vsv,vsh,eta,nlayer,ra,rmax,&
+call calstg( nzone,rrho,vpv,vph,vsv,vsh,eta,nlayer,ra,rmax,&
          vnp,vra,rho,kappa,ecKx,ecKy,ecKz,&
          mu,ecL,ecN,r0,spn,ecC0,ecF0,ecL0 )
 rhoinv(1:vnp)   = 1.d0 / rho(1:vnp)
@@ -667,7 +648,7 @@ do i=1,ndc+1
     endif
 enddo
 ! Computing the modified operator of the 1st derivative
-call caltstg( maxnlay,maxnzone,nzone,rrho,vpv,vph,vsv,vsh,eta,&
+call caltstg(nzone,rrho,vpv,vph,vsv,vsh,eta,&
          nlayer,ra,rmax,vra,kappa,ecKx,ecKy,ecKz,mu,ecL,ecN )
 isl = 0
 do i=1,ndc+1
@@ -675,16 +656,22 @@ do i=1,ndc+1
         isl = isl + 1
         itmp = isdr+issp(isl)
         jtmp = isp(i)+i-1
-        call calh5( nlayer(i),vra(jtmp),ecKx(jtmp),ra(isp(i)),work(itmp) )
-        call submat( nlayer(i),h5ax(itmp),work(itmp),h5x(itmp) )
-        call calh5( nlayer(i),vra(jtmp),ecKy(jtmp),ra(isp(i)),work(itmp) )
-        call submat( nlayer(i),h5ay(itmp),work(itmp),h5y(itmp) )
-        call calh5( nlayer(i),vra(jtmp),ecKz(jtmp),ra(isp(i)),work(itmp) )
-        call submat( nlayer(i),h5az(itmp),work(itmp),h5z(itmp) )
-        call calh5( nlayer(i),vra(jtmp),ecL(jtmp),ra(isp(i)),work(itmp) )
-        call submat( nlayer(i),h6aL(itmp),work(itmp),h6L(itmp) )
-        call calh5( nlayer(i),vra(jtmp),ecN(jtmp),ra(isp(i)),work(itmp) )
-        call submat( nlayer(i),h6aN(itmp),work(itmp),h6N(itmp) )
+  call calh5( nlayer(i),vra(jtmp),ecKx(jtmp),ra(isp(i)),work(itmp) )
+ !           call submat( nlayer(i),h5ax(itmp),work(itmp),h5x(itmp) )
+       h5x(itmp:itmp+4*nlayer(i)-1)= h5ax(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
+            call calh5( nlayer(i),vra(jtmp),ecKy(jtmp),ra(isp(i)),work(itmp) )
+!            call submat( nlayer(i),h5ay(itmp),work(itmp),h5y(itmp) )
+       h5y(itmp:itmp+4*nlayer(i)-1)= h5ay(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
+            call calh5( nlayer(i),vra(jtmp),ecKz(jtmp),ra(isp(i)),work(itmp) )
+!            call submat( nlayer(i),h5az(itmp),work(itmp),h5z(itmp) )
+        h5z(itmp:itmp+4*nlayer(i)-1)= h5az(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
+            call calh5( nlayer(i),vra(jtmp),ecL(jtmp),ra(isp(i)),work(itmp) )
+!            call submat( nlayer(i),h6aL(itmp),work(itmp),h6L(itmp) )
+             h6L(itmp:itmp+4*nlayer(i)-1)= h6aL(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
+
+            call calh5( nlayer(i),vra(jtmp),ecN(jtmp),ra(isp(i)),work(itmp) )
+!            call submat( nlayer(i),h6aN(itmp),work(itmp),h6N(itmp) )
+            h6N(itmp:itmp+4*nlayer(i)-1)= h6aN(itmp:itmp+4*nlayer(i)-1)-work(itmp:itmp+4*nlayer(i)-1)
         call mtrnp( nlayer(i),h5x(itmp),h3x(itmp) )
         call mtrnp( nlayer(i),h5y(itmp),h3y(itmp) )
         call mtrnp( nlayer(i),h5z(itmp),h3z(itmp) )
@@ -708,7 +695,7 @@ do i=1,ndc+1
     endif
 enddo
 ! ******************** Computing the displacement *********************
-!
+
 llog = 0
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !      call simplesplit (imin, imax, PETOT, mpimin, mpimax)
@@ -717,7 +704,7 @@ call trianglesplit (imin, imax, PETOT, mpimin, mpimax)
 do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
     !print*,i
     u=0
-    if ( i.ne.0 ) then
+    if ( i/=0 ) then
         omega = 2.d0 * pi * dble(i) / tlen
         call callsuf(omega,nzone,vrmax,vsv,lsuf)
         plm(1:3,0:3,1:nr)=0
@@ -739,7 +726,7 @@ do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
                 jtmp = jdr+jsp(j)
                 mtmp = kdr+ksp(j)
                 call cala0( nlayer(j),omega,omegai,&
-                    t(itmp),h1x(itmp),h2L(itmp), h2N(itmp),&
+                    t(itmp),h1x(itmp),h2L(itmp),h2N(itmp),&
                     h3ay(itmp),h4aL(itmp),h4aN(itmp),&
                     h5ay(itmp),h6aL(itmp),h6aN(itmp),&
                     h7y(itmp),h7z(itmp),&
@@ -790,8 +777,7 @@ do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
             ! computing the coefficient matrix elements
             ! --- renewing  mdr
             if (  mod(l,50)==0  ) then
-                call calmdr( omega,l,nzone,vrmax,vmin,rmax,sufzone )
-                call calspdr( maxnzone,nzone,iphase,nlayer,jjdr,kkdr )
+                call calspdr( nzone,iphase,nlayer,jjdr,kkdr )
                 nn = kkdr(nzone) + 2 * nlayer(nzone) + 1
             endif
             ! ***** Computing the trial function *****
@@ -799,7 +785,7 @@ do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
                 call calbvec( l,theta(ir),phi(ir),plm(1,0,ir),bvec(1,-2,ir) )
             enddo
             ! computing the matrix elements
-            call cala( maxnzone,ndc,iphase,nlayer,kkdr,kdr,ksp,l2,lsq,nn,a0,a1,a2,a )
+            call cala(  ndc,iphase,nlayer,kkdr,kdr,ksp,l2,lsq,nn,a0,a1,a2,a )
             ! computing the boundary condition elements
             call calbc(ndc,vrmax,iphase,kkdr,a )
             !
@@ -826,9 +812,7 @@ do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
                         call dcsymbdl( c(1,itmp),1,nn0-itmp+1,1,eps,z(itmp),w(itmp),ll,lli,llj,ier )
                         call dcsbdlv( c(1,itmp),d(itmp),1,nn0-itmp+1,ns-itmp+1,z(itmp))
                         ! computing the displacement
-                        do ir=1,nr
-                            call calu0( d(nn0),bvec(1,m,ir),u(1,ir) )
-                        enddo
+                       u(:,1:nr)=d(nn0)*bvec(:,m,1:nr)
                     else
                         ! computing the expansion coefficient
                         itmp=1
@@ -836,7 +820,7 @@ do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
                         ns = kkdr(spn) + 2 * ( nint(spo) - 1 )
                         if( mod(l,100)==0) then
                             if ( ( m==-2 ).or.( m==-l ) ) &
-                             call dcsymbdl0( a(1,itmp),3,nn-itmp+1,6,eps, z(itmp),w(itmp),ll,lli,llj,ier)
+                             call dcsymbdl( a(1,itmp),3,nn-itmp+1,6,eps, z(itmp),w(itmp),ll,lli,llj,ier)
 
                             call dcsbdlv0( a(1,itmp),g(itmp),3,nn-itmp+1,z(itmp))
                             ! sum up c of the same l
@@ -856,9 +840,8 @@ do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
                          call calcutd(nzone,nlayer,tmpc,ratc,nn,iphase,ra,kkdr,kc)
 
                         ! computing the displacement
-                        do ir=1,nr
-                            call calu( g(nn-1),lsq,bvec(1,m,ir),u(1,ir) )
-                        enddo
+                          u(1,1:nr) = u(1,1:nr) + g(nn-1) * bvec(1,m,1:nr)
+                            u(2:3,1:nr) = u(2:3,1:nr) + g(nn) * bvec(2:3,m,1:nr) / lsq
                     endif
                 endif
             enddo            ! m-loop
@@ -869,7 +852,7 @@ do i=mpimin(my_rank+1), mpimax(my_rank+1)            ! omega-loop
     outputu(1:3,1:nr,i)=u(1:3,1:nr)
 enddo                   ! omega-loop
 
-if(my_rank .ne.0) then
+if(my_rank /=0) then
     call mpi_send(outputu(1,1,mpimin(my_rank+1)),&
         3*nr*(mpimax(my_rank+1)-mpimin(my_rank+1)+1),&
         MPI_DOUBLE_complex,0,my_rank, MPI_COMM_WORLD, ierr)
@@ -883,15 +866,13 @@ if(my_rank==0)then
     enddo
     ! ************************** Files Handling **************************
     do ir = 1 ,nr
-        open(unit=10,file=trim(output(ir)),&
-            status='unknown', form='unformatted',&
+        open(unit=1,file=trim(output(ir)),status='unknown', form='unformatted',&
            access='stream', convert='big_endian')
-        write(10) tlen,np,1,3,omegai,lat(ir),lon(ir)
-        write(10) eqlat,eqlon,r0
+        write(1) tlen,np,1,3,omegai,lat(ir),lon(ir),eqlat,eqlon,r0
         do i= imin, imax
-            write(10) i,dble(outputu(1,ir,i)),dimag(outputu(1,ir,i))
-            write(10) dble(outputu(2,ir,i)),dimag(outputu(2,ir,i))
-            write(10) dble(outputu(3,ir,i)),dimag(outputu(3,ir,i))
+            write(1) i,dble(outputu(1,ir,i)),dimag(outputu(1,ir,i))
+            write(1) dble(outputu(2,ir,i)),dimag(outputu(2,ir,i))
+            write(1) dble(outputu(3,ir,i)),dimag(outputu(3,ir,i))
         enddo
         close(10)
     enddo
@@ -907,5 +888,5 @@ write(*,*) my_rank, "Ivalice looks to the horizon"
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 call mpi_finalize (ierr)
 stop
-end
+end program mpitipsv
 
