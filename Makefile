@@ -22,4 +22,4 @@ mpi-tipsv.o: mpi-tipsv.f90
 %.o:%.mod
 
 clean:
-	rm -f $(OBJS) $(PROGS)
+	rm -f $(OBJS) $(PROGS) parameters.mod
